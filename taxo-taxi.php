@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .5
+Version: .51
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -145,7 +145,7 @@ class TaxoTaxi{
 	*/
 	public static function posts_join( $sql ){
 		$sql .= " LEFT JOIN ".self::$wpdb->term_relationships." TR_AUTO 
-					ON oac_posts.ID = TR_AUTO.object_id
+					ON ".self::$wpdb->posts.".ID = TR_AUTO.object_id
 				  LEFT JOIN ".self::$wpdb->term_taxonomy." TX_AUTO 
 				  	ON TR_AUTO.term_taxonomy_id = TX_AUTO.term_taxonomy_id 
 				  	AND TX_AUTO.taxonomy NOT IN( 'category', 'post_tag' )
@@ -230,8 +230,8 @@ class TaxoTaxi{
 		foreach( self::$taxonomies as $taxonomy ){
 			$selected = isset( $_GET[$taxonomy->name] ) ? $_GET[$taxonomy->name] : FALSE;
 			$sql = self::$wpdb->prepare( "SELECT T.*, TX.parent, IF( T.slug = %s, 'selected=\"selected\"', '' ) AS `selected` 
-										  FROM oac_terms T
-										  LEFT JOIN oac_term_taxonomy TX ON T.term_id = TX.term_id
+										  FROM ".self::$wpdb->terms." T
+										  LEFT JOIN ".self::$wpdb->term_taxonomy." TX ON T.term_id = TX.term_id
 										  WHERE TX.taxonomy = %s
 										  ORDER BY T.name ASC", $selected, $taxonomy->name );
 			$cats = self::$wpdb->get_results( $sql );
