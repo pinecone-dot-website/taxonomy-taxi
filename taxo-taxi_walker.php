@@ -1,7 +1,7 @@
 <?php
 /*
 *	builds nested drop down selects in wp-admin/edit.php
-*	Version: .51
+*	Version: .52
 */
 class Walker_Taxo_Taxi extends Walker{
 	

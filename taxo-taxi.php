@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .51
+Version: .52
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -165,7 +165,7 @@ class TaxoTaxi{
 		
 		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'asc' : 'desc';
 		
-		$sql = $_GET['orderby']."_names $order ";
+		$sql = "`{$_GET['orderby']}_names` $order ";
 		return $sql;
 	}
 	
