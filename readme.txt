@@ -6,9 +6,8 @@ Requires at least: 3.1.3
 Tested up to: 3.1.3
 Stable tag: trunk
 
-Automatically display custom taxonomy information in wp-admin/edit.php
-
 == Description ==
+Automatically display custom taxonomy information in wp-admin/edit.php
 Tested with Wordpress 3.1.3 
 Requires PHP 5.  PHP 4 is like 10 years old, you know?
 
@@ -23,9 +22,6 @@ Requires PHP 5.  PHP 4 is like 10 years old, you know?
 
 = 0.5 =
 * First release *
-
-== Frequently Asked Questions ==
-
 
 == Screenshots ==
 1. hack
