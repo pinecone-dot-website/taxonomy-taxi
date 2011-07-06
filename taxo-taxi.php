@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .52
+Version: .55
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -19,14 +19,13 @@ class TaxoTaxi{
 												// with default categories and post tags removed
 	
 	/*
-	*
-	*
+	*	called on `load-edit.php` action
+	*	sets up class variables and the rest of the actions / filters
 	*/
 	public static function setup(){
+		// safety? may not be needed
 		if( !is_admin() )
 			return;
-		
-		// TODO continue if user is on the edit screen
 		
 		global $wpdb;
 		self::$wpdb = &$wpdb;
@@ -35,6 +34,7 @@ class TaxoTaxi{
 		
 		add_action( 'query_vars', 'TaxoTaxi::query_vars' );
 		
+		add_filter( 'manage_edit-post_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
 		add_filter( 'manage_posts_columns', 'TaxoTaxi::manage_posts_columns' );
 		add_action( 'manage_posts_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		
@@ -44,7 +44,8 @@ class TaxoTaxi{
 		add_filter( 'posts_orderby', 'TaxoTaxi::posts_orderby' );
 		add_filter( 'posts_request', 'TaxoTaxi::posts_request' );
 		add_filter( 'posts_results', 'TaxoTaxi::posts_results' );
-		
+
+		add_filter( 'request', 'TaxoTaxi::request' );	
 		add_action( 'restrict_manage_posts', 'TaxoTaxi::restrict_manage_posts' );
 	}
 	
@@ -219,6 +220,35 @@ class TaxoTaxi{
 	}
 	
 	/*
+	*	register custom taxonomies for sortable columns
+	*	@param array
+	*	@return array
+	*/
+	static public function register_sortable_columns( $columns ){
+		$keys = array_keys( self::$taxonomies );
+		$keys = array_combine( $keys, $keys );
+		
+		$columns = array_merge( $columns, $keys ); 
+		return $columns;
+	}
+	
+	/*
+	*	fix bug in setting post_format query varaible
+	*	wp-includes/post.php function _post_format_request()
+	*		$tax = get_taxonomy( 'post_format' );
+	*		$qvs['post_type'] = $tax->object_type;
+	*		sets global $post_type to an array
+	*	@param array
+	*	@return array
+	*/
+	static public function request( $qvs ){
+		if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
+			$qvs['post_type'] = $qvs['post_type'][0];
+			
+		return $qvs;
+	}
+	
+	/*
 	*	action for `restrict_manage_posts` 
 	*	to display drop down selects for custom taxonomies
 	*/
@@ -226,18 +256,18 @@ class TaxoTaxi{
 		$html = '';
 		
 		$Walker = new Walker_Taxo_Taxi;
-		
+
 		foreach( self::$taxonomies as $taxonomy ){
 			$selected = isset( $_GET[$taxonomy->name] ) ? $_GET[$taxonomy->name] : FALSE;
-			$sql = self::$wpdb->prepare( "SELECT T.*, TX.parent, IF( T.slug = %s, 'selected=\"selected\"', '' ) AS `selected` 
+			$sql = self::$wpdb->prepare( "SELECT T.*, TX.parent, TX.taxonomy,
+											IF( T.slug = %s, 'selected=\"selected\"', '' ) AS `selected` 
 										  FROM ".self::$wpdb->terms." T
 										  LEFT JOIN ".self::$wpdb->term_taxonomy." TX ON T.term_id = TX.term_id
 										  WHERE TX.taxonomy = %s
 										  ORDER BY T.name ASC", $selected, $taxonomy->name );
 			$cats = self::$wpdb->get_results( $sql );
-
 			$html .= '<select name="'.$taxonomy->name.'">';
-			$html .= '<option value="">View all '.strtolower( $taxonomy->labels->name ).'</option>';
+			$html .= $taxonomy->name == 'post_format' ? '<option value="">View all post formats &nbsp;</option>' : '<option value="">View all '.strtolower( $taxonomy->labels->name ).' &nbsp;</option>';
 			$html .= $Walker->walk( $cats, 20 );
 			$html .= '</select>';
 		}
@@ -264,4 +294,4 @@ class TaxoTaxi{
 	}
 }
 
-add_action( 'init', 'TaxoTaxi::setup' );
+add_action( 'load-edit.php', 'TaxoTaxi::setup' );
