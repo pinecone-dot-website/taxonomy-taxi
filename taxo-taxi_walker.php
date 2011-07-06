@@ -7,7 +7,7 @@ class Walker_Taxo_Taxi extends Walker{
 	
 	public $db_fields = array( 'parent' => 'parent', 'id' => 'term_id' );
 
-	public function start_el( &$output, $category, $depth, $args = '' ){
+	public function start_el( &$output, $category, $depth ){
 		
 		if( $category->taxonomy == 'post_format' )
 			$output .= '<option value="'.$category->slug.'" '.$category->selected.'>'.
