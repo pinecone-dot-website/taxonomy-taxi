@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .55
+Version: .56
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -206,7 +206,8 @@ class TaxoTaxi{
 				// there seems to be a problem with the length limit from group_concat
 				// refactoring this method as above should get rid of the problem
 				if( isset($order[$k]) )
-					$taxonomies[ $order[$k] ][] = array( 'name' => $name, 
+					$taxonomies[ $order[$k] ][] = array( 'name' => $name,
+														 'post_type' => $post->post_type,
 														 'slug' => $slugs[$k], 
 														 'taxonomy' => $order[$k] );
 			}
@@ -281,7 +282,7 @@ class TaxoTaxi{
 	*	@return string
 	*/
 	public static function _array_map_buildLinks( $array ){
-		return '<a href="?post_type=blog&'.$array['taxonomy'].'='.$array['slug'].'">'.$array['name'].'</a>';
+		return '<a href="?post_type='.$array['post_type'].'&'.$array['taxonomy'].'='.$array['slug'].'">'.$array['name'].'</a>';
 	}
 	
 	/*

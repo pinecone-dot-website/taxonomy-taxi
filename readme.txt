@@ -17,6 +17,9 @@ Requires PHP 5.  PHP 4 is like 10 years old, you know?
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= 0.56 =
+* Fixed bug in post_type when clicking on custom taxonomy in edit table
+
 = 0.55 =
 * Fixed bug in filtering table multiple times ($post_type was being set to an array)
 * Applies filters and actions only on wp-admin/edit.php, using `load-edit.php` action
