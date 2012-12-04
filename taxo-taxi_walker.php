@@ -1,11 +1,12 @@
 <?php
 /*
 *	builds nested drop down selects in wp-admin/edit.php
-*	Version: .56
+*	Version: .57
 */
 class Walker_Taxo_Taxi extends Walker{
 	
-	public $db_fields = array( 'parent' => 'parent', 'id' => 'term_id' );
+	public $db_fields = array( 'parent' => 'parent', 
+							   'id' => 'term_id' );
 
 	public function start_el( &$output, $category, $depth ){
 		

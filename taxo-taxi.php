@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .56
+Version: .57
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -23,7 +23,6 @@ class TaxoTaxi{
 	*	sets up class variables and the rest of the actions / filters
 	*/
 	public static function setup(){
-		// safety? may not be needed
 		if( !is_admin() )
 			return;
 		
@@ -61,8 +60,8 @@ class TaxoTaxi{
 		self::$taxonomies = get_object_taxonomies( $post_type, 'objects' );
 		
 		// don't show default taxonomies twice
-		unset( self::$taxonomies['category']);
-		unset( self::$taxonomies['post_tag']);
+		unset( self::$taxonomies['category'] );
+		unset( self::$taxonomies['post_tag'] );
 		
 		return $default;
 	}
@@ -75,7 +74,7 @@ class TaxoTaxi{
 	public static function manage_posts_columns( $headings ){
 		// default is to show before Categories
 		$keys = array_keys( $headings );
-		$key = array_search('categories', $keys);
+		$key = array_search( 'categories', $keys );
 		
 		// arbitary placement in table
 		if( !$key )
@@ -126,6 +125,7 @@ class TaxoTaxi{
 		$sql .= ", GROUP_CONCAT( (TX_AUTO.taxonomy) ) AS `concat_taxonomy`
 				 , GROUP_CONCAT( (T_AUTO.slug) ) AS `concat_slug`
 				 , GROUP_CONCAT( (T_AUTO.name) ) AS `concat_name`";
+				 
 		return $sql;
 	}
 	
@@ -181,7 +181,7 @@ class TaxoTaxi{
 	}
 	
 	/*
-	*	filter for `posts_results` to parse taxonomy daya from each $post into array for later display 
+	*	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
 	*	@param array
 	*	@return array
 	*/
@@ -211,8 +211,6 @@ class TaxoTaxi{
 														 'slug' => $slugs[$k], 
 														 'taxonomy' => $order[$k] );
 			}
-			
-			
 			
 			$post = (object) array_merge( (array) $post, $taxonomies );
 		}
@@ -263,12 +261,15 @@ class TaxoTaxi{
 			$sql = self::$wpdb->prepare( "SELECT T.*, TX.parent, TX.taxonomy,
 											IF( T.slug = %s, 'selected=\"selected\"', '' ) AS `selected` 
 										  FROM ".self::$wpdb->terms." T
-										  LEFT JOIN ".self::$wpdb->term_taxonomy." TX ON T.term_id = TX.term_id
+										  LEFT JOIN ".self::$wpdb->term_taxonomy." TX 
+										  	ON T.term_id = TX.term_id
 										  WHERE TX.taxonomy = %s
 										  ORDER BY T.name ASC", $selected, $taxonomy->name );
 			$cats = self::$wpdb->get_results( $sql );
 			$html .= '<select name="'.$taxonomy->name.'">';
-			$html .= $taxonomy->name == 'post_format' ? '<option value="">View all post formats &nbsp;</option>' : '<option value="">View all '.strtolower( $taxonomy->labels->name ).' &nbsp;</option>';
+			$html .= $taxonomy->name == 'post_format' ? 
+				'<option value="">View all post formats &nbsp;</option>' :
+				'<option value="">View all '.strtolower( $taxonomy->labels->name ).' &nbsp;</option>';
 			$html .= $Walker->walk( $cats, 20 );
 			$html .= '</select>';
 		}
