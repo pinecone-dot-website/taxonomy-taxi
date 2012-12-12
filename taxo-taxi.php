@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .57
+Version: .58
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -26,14 +26,14 @@ class TaxoTaxi{
 		if( !is_admin() )
 			return;
 		
-		global $wpdb;
+		global $wpdb, $post;
 		self::$wpdb = &$wpdb;
 		
 		require 'taxo-taxi_walker.php';
 		
 		add_action( 'query_vars', 'TaxoTaxi::query_vars' );
 		
-		add_filter( 'manage_edit-post_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
+		add_filter( 'manage_edit-'.$_GET['post_type'].'_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
 		add_filter( 'manage_posts_columns', 'TaxoTaxi::manage_posts_columns' );
 		add_action( 'manage_posts_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		
@@ -116,15 +116,17 @@ class TaxoTaxi{
 	public static function posts_fields( $sql ){
 		foreach( self::$taxonomies as $tax ){
 			$tax = self::$wpdb->escape( $tax->name );
-			$sql .= ", GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.name, NULL)) ) AS `{$tax}_names`,
-					   GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.slug, NULL)) ) AS `{$tax}_slugs`";
+			$sql .= ", GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.name, NULL)) ORDER BY T_AUTO.name ASC ) 
+							AS `{$tax}_names`,
+					   GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.slug, NULL)) ORDER BY T_AUTO.name ASC ) 
+					   		AS `{$tax}_slugs`";
 		}
 		
 		// TODO: this should be unnecessary with the above sql.  
 		// refactor TaxoTaxi::posts_results to not need this 
-		$sql .= ", GROUP_CONCAT( (TX_AUTO.taxonomy) ) AS `concat_taxonomy`
-				 , GROUP_CONCAT( (T_AUTO.slug) ) AS `concat_slug`
-				 , GROUP_CONCAT( (T_AUTO.name) ) AS `concat_name`";
+		$sql .= ", GROUP_CONCAT( (TX_AUTO.taxonomy) ORDER BY T_AUTO.name ASC ) AS `concat_taxonomy`
+				 , GROUP_CONCAT( (T_AUTO.slug) ORDER BY T_AUTO.name ASC ) AS `concat_slug`
+				 , GROUP_CONCAT( (T_AUTO.name) ORDER BY T_AUTO.name ASC ) AS `concat_name`";
 				 
 		return $sql;
 	}
@@ -152,6 +154,7 @@ class TaxoTaxi{
 				  	AND TX_AUTO.taxonomy NOT IN( 'category', 'post_tag' )
 				  LEFT JOIN ".self::$wpdb->terms." T_AUTO 
 				  	ON TX_AUTO.term_id = T_AUTO.term_id ";
+				  	
 		return $sql;
 	}
 	
@@ -228,6 +231,7 @@ class TaxoTaxi{
 		$keys = array_combine( $keys, $keys );
 		
 		$columns = array_merge( $columns, $keys ); 
+		
 		return $columns;
 	}
 	
@@ -270,7 +274,7 @@ class TaxoTaxi{
 			$html .= $taxonomy->name == 'post_format' ? 
 				'<option value="">View all post formats &nbsp;</option>' :
 				'<option value="">View all '.strtolower( $taxonomy->labels->name ).' &nbsp;</option>';
-			$html .= $Walker->walk( $cats, 20 );
+			$html .= $Walker->walk( $cats, 20, FALSE );
 			$html .= '</select>';
 		}
 		

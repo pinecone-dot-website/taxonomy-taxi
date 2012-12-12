@@ -3,13 +3,12 @@ Contributors: postpostmodern
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.1.3
-Tested up to: 3.4.2
+Tested up to: 3.5
 Stable tag: trunk
 
 == Description ==
 Automatically display custom taxonomy information in wp-admin/edit.php
-Not tested with versions pre- 3.1.3 
-Requires PHP 5.  PHP 4 is like 10 years old, you know?
+Not tested with versions pre- 3.2 - requires PHP 5
 
 == Installation ==
 1. Place /taxonomi-taxi/ directory in /wp-content/plugins/
@@ -17,6 +16,9 @@ Requires PHP 5.  PHP 4 is like 10 years old, you know?
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= 0.6 =
+* Order taxonomies alphabetically, sortable column for custom post types *
+
 = 0.57 =
 * Minor code cleanup, screenshots *
 
