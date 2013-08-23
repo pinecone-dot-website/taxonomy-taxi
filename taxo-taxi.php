@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .58
+Version: .6
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -11,11 +11,17 @@ Photo URL: http://www.flickr.com/photos/photos_mweber/540970484/
 Photo License: Attribution-NonCommercial 2.0 Generic (CC BY-NC 2.0)
 */
 
+if( !is_admin() )
+	return;
+
+add_action( 'load-edit.php', 'TaxoTaxi::setup' );
+	
 class TaxoTaxi{
 	private static $wpdb;						// pretend that $wpdb is not global
 	
 	private static $post_type = '';				// single custom post type we are working with
-	private static $taxonomies = array();		// populated by get_object_taxonomies, 
+	private static $taxonomies = array();		// the taxonomies associated with current post type
+												// populated by get_object_taxonomies, 
 												// with default categories and post tags removed
 	
 	/*
@@ -23,17 +29,15 @@ class TaxoTaxi{
 	*	sets up class variables and the rest of the actions / filters
 	*/
 	public static function setup(){
-		if( !is_admin() )
-			return;
-		
-		global $wpdb, $post;
+		global $wpdb;
 		self::$wpdb = &$wpdb;
 		
 		require 'taxo-taxi_walker.php';
 		
-		add_action( 'query_vars', 'TaxoTaxi::query_vars' );
+		add_filter( 'query_vars', 'TaxoTaxi::query_vars' );
 		
-		add_filter( 'manage_edit-'.$_GET['post_type'].'_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
+		$post_type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
+		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
 		add_filter( 'manage_posts_columns', 'TaxoTaxi::manage_posts_columns' );
 		add_action( 'manage_posts_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		
@@ -50,6 +54,7 @@ class TaxoTaxi{
 	
 	/*
 	*	setup class variables as soon as posssible, once $post_type is available
+	*	attached to `query_vars` filter
 	*	@param array not used
 	*	@return array 
 	*/
@@ -67,7 +72,8 @@ class TaxoTaxi{
 	}
 	
 	/*
-	*	filter for `manage_posts_columns` to add columns for custom taxonomies in Edit table
+	*	attached to `manage_posts_columns` filter
+	*	adds columns for custom taxonomies in Edit table
 	*	@param array $headings
 	*	@return array $headings
 	*/
@@ -91,7 +97,8 @@ class TaxoTaxi{
 	}
 	
 	/*
-	*	action for `manage_posts_custom_column` to echo column data inside each table cell
+	*	attached to `manage_posts_custom_column` action
+	*	echos column data inside each table cell
 	*	@param string 
 	*	@param int
 	*	@return NULL
@@ -116,13 +123,15 @@ class TaxoTaxi{
 	public static function posts_fields( $sql ){
 		foreach( self::$taxonomies as $tax ){
 			$tax = self::$wpdb->escape( $tax->name );
-			$sql .= ", GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.name, NULL)) ORDER BY T_AUTO.name ASC ) 
+			$sql .= ", GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.name, NULL)) 
+							ORDER BY T_AUTO.name ASC ) 
 							AS `{$tax}_names`,
-					   GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.slug, NULL)) ORDER BY T_AUTO.name ASC ) 
+					   GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.slug, NULL)) 
+					   		ORDER BY T_AUTO.name ASC ) 
 					   		AS `{$tax}_slugs`";
 		}
 		
-		// TODO: this should be unnecessary with the above sql.  
+		// @TODO: this should be unnecessary with the above sql.  
 		// refactor TaxoTaxi::posts_results to not need this 
 		$sql .= ", GROUP_CONCAT( (TX_AUTO.taxonomy) ORDER BY T_AUTO.name ASC ) AS `concat_taxonomy`
 				 , GROUP_CONCAT( (T_AUTO.slug) ORDER BY T_AUTO.name ASC ) AS `concat_slug`
@@ -185,13 +194,13 @@ class TaxoTaxi{
 	
 	/*
 	*	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
-	*	@param array
+	*	@param array WP_Post
 	*	@return array
 	*/
 	public static function posts_results( $posts ){
 		foreach( $posts as &$post ){
 			// TODO: refactor this to not need the extra sql fields in TaxoTaxi::posts_fields
-		
+			
 			// if this is NULL, then no custom taxonomies were found for the post
 			if( !$post->concat_taxonomy )
 				continue;
@@ -205,7 +214,7 @@ class TaxoTaxi{
 			$slugs = explode( ',', $post->concat_slug );
 			$names = explode( ',', $post->concat_name );
 		
-			foreach( $names as $k=>$name){
+			foreach( $names as $k=>$name ){
 				// there seems to be a problem with the length limit from group_concat
 				// refactoring this method as above should get rid of the problem
 				if( isset($order[$k]) )
@@ -215,7 +224,8 @@ class TaxoTaxi{
 														 'taxonomy' => $order[$k] );
 			}
 			
-			$post = (object) array_merge( (array) $post, $taxonomies );
+			$props = array_merge( $post->to_array(), $taxonomies );
+			$post = new WP_Post( (object) $props );
 		}
 		
 		return $posts;
@@ -299,5 +309,3 @@ class TaxoTaxi{
 		return $object->labels->name;
 	}
 }
-
-add_action( 'load-edit.php', 'TaxoTaxi::setup' );

@@ -2,8 +2,8 @@
 Contributors: postpostmodern
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
-Requires at least: 3.1.3
-Tested up to: 3.5
+Requires at least: 3.2
+Tested up to: 3.6
 Stable tag: trunk
 
 == Description ==
@@ -16,7 +16,10 @@ Not tested with versions pre- 3.2 - requires PHP 5
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
-= 0.6 =
+= .6 =
+* Minor cleanup, use WP_Post class for post results
+
+= 0.58 =
 * Order taxonomies alphabetically, sortable column for custom post types *
 
 = 0.57 =
