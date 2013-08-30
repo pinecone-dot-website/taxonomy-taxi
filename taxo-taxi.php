@@ -274,7 +274,7 @@ class TaxoTaxi{
 				'hierarchical' => TRUE,
 				'name' => $taxonomy,
 				'selected' => isset( $_GET[$taxonomy] ) ? $_GET[$taxonomy] : FALSE,
-				'show_option_none' => 'View All '.$props->labels->all_items,
+				'show_option_all' => 'View All '.$props->labels->all_items,
 				'taxonomy' => $taxonomy,
 				'walker' => new Walker_Taxo_Taxi
 			) );
