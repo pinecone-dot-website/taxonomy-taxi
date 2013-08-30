@@ -3,7 +3,7 @@
 Plugin Name: Taxonomy Taxi
 Plugin URI: 
 Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .6
+Version: .7
 Author: Eric Eaglstun
 Author URI: 
 Photo Credit: http://www.flickr.com/photos/photos_mweber/
@@ -122,7 +122,8 @@ class TaxoTaxi{
 	*/
 	public static function posts_fields( $sql ){
 		foreach( self::$taxonomies as $tax ){
-			$tax = self::$wpdb->escape( $tax->name );
+			$tax = esc_sql( $tax->name );
+			
 			$sql .= ", GROUP_CONCAT( DISTINCT(IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.name, NULL)) 
 							ORDER BY T_AUTO.name ASC ) 
 							AS `{$tax}_names`,
@@ -177,8 +178,9 @@ class TaxoTaxi{
 			return $sql;
 		
 		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'asc' : 'desc';
+		$orderby = esc_sql( $_GET['orderby'] );
 		
-		$sql = "`{$_GET['orderby']}_names` $order ";
+		$sql = "`{$orderby}_names` $order ";
 		return $sql;
 	}
 	
@@ -188,7 +190,7 @@ class TaxoTaxi{
 	*	@return string
 	*/
 	public static function posts_request( $sql ){
-		//dbug( $sql );
+		//ddbug( $sql );
 		return $sql;
 	}
 	
@@ -236,7 +238,7 @@ class TaxoTaxi{
 	*	@param array
 	*	@return array
 	*/
-	static public function register_sortable_columns( $columns ){
+	public static function register_sortable_columns( $columns ){
 		$keys = array_keys( self::$taxonomies );
 		$keys = array_combine( $keys, $keys );
 		
@@ -254,7 +256,7 @@ class TaxoTaxi{
 	*	@param array
 	*	@return array
 	*/
-	static public function request( $qvs ){
+	public static function request( $qvs ){
 		if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
 			$qvs['post_type'] = $qvs['post_type'][0];
 			
@@ -266,29 +268,19 @@ class TaxoTaxi{
 	*	to display drop down selects for custom taxonomies
 	*/
 	public static function restrict_manage_posts(){
-		$html = '';
-		
-		$Walker = new Walker_Taxo_Taxi;
-
-		foreach( self::$taxonomies as $taxonomy ){
-			$selected = isset( $_GET[$taxonomy->name] ) ? $_GET[$taxonomy->name] : FALSE;
-			$sql = self::$wpdb->prepare( "SELECT T.*, TX.parent, TX.taxonomy,
-											IF( T.slug = %s, 'selected=\"selected\"', '' ) AS `selected` 
-										  FROM ".self::$wpdb->terms." T
-										  LEFT JOIN ".self::$wpdb->term_taxonomy." TX 
-										  	ON T.term_id = TX.term_id
-										  WHERE TX.taxonomy = %s
-										  ORDER BY T.name ASC", $selected, $taxonomy->name );
-			$cats = self::$wpdb->get_results( $sql );
-			$html .= '<select name="'.$taxonomy->name.'">';
-			$html .= $taxonomy->name == 'post_format' ? 
-				'<option value="">View all post formats &nbsp;</option>' :
-				'<option value="">View all '.strtolower( $taxonomy->labels->name ).' &nbsp;</option>';
-			$html .= $Walker->walk( $cats, 20, FALSE );
-			$html .= '</select>';
+		foreach( self::$taxonomies as $taxonomy => $props ){
+			$html = wp_dropdown_categories( array(
+				'echo' => 0,
+				'hierarchical' => TRUE,
+				'name' => $taxonomy,
+				'selected' => isset( $_GET[$taxonomy] ) ? $_GET[$taxonomy] : FALSE,
+				'show_option_none' => 'View All '.$props->labels->all_items,
+				'taxonomy' => $taxonomy,
+				'walker' => new Walker_Taxo_Taxi
+			) );
+			
+			echo $html;
 		}
-		
-		echo $html;
 	}
 	
 	/*

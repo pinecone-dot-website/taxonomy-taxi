@@ -1,22 +1,31 @@
 <?php
 /*
 *	builds nested drop down selects in wp-admin/edit.php
-*	Version: .58
+*	sets value to be term slug rather than term id
+*	Version: .7
 */
-class Walker_Taxo_Taxi extends Walker{
+class Walker_Taxo_Taxi extends Walker_CategoryDropdown{
 	
-	public $db_fields = array( 'parent' => 'parent', 
-							   'id' => 'term_id' );
-
-	public function start_el( &$output, $category, $depth ){
+	public function start_el( &$output, $category, $depth = 0, $args = array(), $current_object_id = 0 ){
+		$pad = str_repeat( '&nbsp;', $depth * 2 );
+		$cat_name = apply_filters('list_cats', $category->name, $category);
 		
-		if( $category->taxonomy == 'post_format' )
-			$output .= '<option value="'.$category->slug.'" '.$category->selected.'>'.
-						str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;", $depth).' '.ucwords(substr($category->name, 12)).' '.
-						'</option>';
-		else
-			$output .= '<option value="'.$category->slug.'" '.$category->selected.'>'.
-						str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;", $depth).' '.$category->name.' '.
-						'</option>';
+		if( !isset($args['value']) ){
+			$args['value'] = ( $category->taxonomy != 'category' ? 'slug' : 'id' );
+		}
+		
+		$output .= "<option class=\"level-$depth\" value=\"".$category->slug."\"";
+		//ddbug( $args['selected'] );
+		
+		if( $category->slug === $args['selected'] )
+			$output .= ' selected="selected"';
+		
+		$output .= '>';
+		$output .= $pad.$cat_name;
+		
+		if( $args['show_count'] )
+			$output .= '&nbsp;&nbsp;('. $category->count .')';
+	
+		$output .= "</option>\n";
 	}
 }
