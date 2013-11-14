@@ -1,21 +1,10 @@
 <?php
-/*
-Plugin Name: Taxonomy Taxi
-Plugin URI: 
-Description: Show custom taxonomies in /wp-admin/edit.php automatically
-Version: .7
-Author: Eric Eaglstun
-Author URI: 
-Photo Credit: http://www.flickr.com/photos/photos_mweber/
-Photo URL: http://www.flickr.com/photos/photos_mweber/540970484/
-Photo License: Attribution-NonCommercial 2.0 Generic (CC BY-NC 2.0)
-*/
-
-if( !is_admin() )
-	return;
 
 add_action( 'load-edit.php', 'TaxoTaxi::setup' );
-	
+
+/*
+*
+*/	
 class TaxoTaxi{
 	private static $wpdb;						// pretend that $wpdb is not global
 	
@@ -32,13 +21,15 @@ class TaxoTaxi{
 		global $wpdb;
 		self::$wpdb = &$wpdb;
 		
-		require 'taxo-taxi_walker.php';
+		require dirname( __FILE__ ).'/taxo-taxi_walker.php';
 		
 		add_filter( 'query_vars', 'TaxoTaxi::query_vars' );
 		
 		$post_type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
 		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
 		add_filter( 'manage_posts_columns', 'TaxoTaxi::manage_posts_columns' );
+		
+		add_action( 'manage_pages_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		add_action( 'manage_posts_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		
 		add_filter( 'posts_fields', 'TaxoTaxi::posts_fields' );
