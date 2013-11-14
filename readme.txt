@@ -16,8 +16,14 @@ Not tested with versions pre- 3.2 - requires PHP 5
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .75 =
+* Fix data to show in column on hierarchical post types
+
 = .7 =
 * Use wp_dropdown_categories() for filtering ui
+
+= 0.61 =
+* Fix for hierarchical post types
 
 = .6 =
 * Minor cleanup, use WP_Post class for post results
