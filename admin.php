@@ -21,7 +21,7 @@ class TaxoTaxi{
 		global $wpdb;
 		self::$wpdb = &$wpdb;
 		
-		require dirname( __FILE__ ).'/taxo-taxi_walker.php';
+		require dirname( __FILE__ ).'/lib/walker-taxo-taxi.php';
 		
 		add_filter( 'query_vars', 'TaxoTaxi::query_vars' );
 		

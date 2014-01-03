@@ -1,5 +1,5 @@
 === Taxonomy Taxi ===
-Contributors: postpostmodern
+Contributors: postpostmodern, pinecone-dot-io
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.2
@@ -16,6 +16,9 @@ Not tested with versions pre- 3.2 - requires PHP 5
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .76 =
+* Move to github
+
 = .75 =
 * Fix data to show in column on hierarchical post types
 
