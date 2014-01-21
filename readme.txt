@@ -16,6 +16,9 @@ Not tested with versions pre- 3.2 - requires PHP 5
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .8 =
+* Move to standard format, php >= 5.3 
+
 = .76 =
 * Move to github
 
