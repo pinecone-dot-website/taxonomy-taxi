@@ -1,10 +1,13 @@
 <?php
+
+namespace taxonomytaxi;
+
 /*
 *	builds nested drop down selects in wp-admin/edit.php
 *	sets value to be term slug rather than term id
-*	Version: .7
+*	Version: .8
 */
-class Walker_Taxo_Taxi extends Walker_CategoryDropdown{
+class Walker_Taxo_Taxi extends \Walker_CategoryDropdown{
 	
 	public function start_el( &$output, $category, $depth = 0, $args = array(), $current_object_id = 0 ){
 		$pad = str_repeat( '&nbsp;', $depth * 2 );

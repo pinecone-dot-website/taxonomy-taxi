@@ -1,6 +1,9 @@
 <?php
 
-add_action( 'load-edit.php', 'TaxoTaxi::setup' );
+namespace taxonomytaxi;
+
+add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\inline_save', 0 );
+add_action( 'load-edit.php', __NAMESPACE__.'\TaxoTaxi::setup' );
 
 /*
 *
@@ -23,24 +26,23 @@ class TaxoTaxi{
 		
 		require dirname( __FILE__ ).'/lib/walker-taxo-taxi.php';
 		
-		add_filter( 'query_vars', 'TaxoTaxi::query_vars' );
+		add_filter( 'query_vars', __NAMESPACE__.'\TaxoTaxi::query_vars' );
 		
 		$post_type = isset( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
-		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', 'TaxoTaxi::register_sortable_columns' );
-		add_filter( 'manage_posts_columns', 'TaxoTaxi::manage_posts_columns' );
+		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\TaxoTaxi::register_sortable_columns' );
+		add_filter( 'manage_posts_columns', __NAMESPACE__.'\TaxoTaxi::manage_posts_columns' );
 		
-		add_action( 'manage_pages_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
-		add_action( 'manage_posts_custom_column', 'TaxoTaxi::manage_posts_custom_column', 10, 2 );
+		add_action( 'manage_pages_custom_column', __NAMESPACE__.'\TaxoTaxi::manage_posts_custom_column', 10, 2 );
+		add_action( 'manage_posts_custom_column', __NAMESPACE__.'\TaxoTaxi::manage_posts_custom_column', 10, 2 );
 		
-		add_filter( 'posts_fields', 'TaxoTaxi::posts_fields' );
-		add_filter( 'posts_groupby', 'TaxoTaxi::posts_groupby' );
-		add_filter( 'posts_join', 'TaxoTaxi::posts_join' );
-		add_filter( 'posts_orderby', 'TaxoTaxi::posts_orderby' );
-		add_filter( 'posts_request', 'TaxoTaxi::posts_request' );
-		add_filter( 'posts_results', 'TaxoTaxi::posts_results' );
+		add_filter( 'posts_fields', __NAMESPACE__.'\TaxoTaxi::posts_fields' );
+		add_filter( 'posts_groupby', __NAMESPACE__.'\TaxoTaxi::posts_groupby' );
+		add_filter( 'posts_join', __NAMESPACE__.'\TaxoTaxi::posts_join' );
+		add_filter( 'posts_request', __NAMESPACE__.'\posts_request' );
+		add_filter( 'posts_results', __NAMESPACE__.'\TaxoTaxi::posts_results' );
 
-		add_filter( 'request', 'TaxoTaxi::request' );	
-		add_action( 'restrict_manage_posts', 'TaxoTaxi::restrict_manage_posts' );
+		add_filter( 'request', __NAMESPACE__.'\request' );	
+		add_action( 'restrict_manage_posts', __NAMESPACE__.'\TaxoTaxi::restrict_manage_posts' );
 	}
 	
 	/*
@@ -79,7 +81,7 @@ class TaxoTaxi{
 		
 		// display the extra taxonomies after standard Categories
 		$a = array_slice( $headings, 0, $key );
-		$b = array_map( 'TaxoTaxi::_array_map_taxonomies', self::$taxonomies );
+		$b = array_map( __NAMESPACE__.'\array_map_taxonomies', self::$taxonomies );
 		$c = array_slice( $headings, $key );
 		
 		$headings = array_merge( $a, $b, $c );
@@ -100,7 +102,7 @@ class TaxoTaxi{
 		if( !isset($post->$column_name) || !count($post->$column_name) )
 			return print '&nbsp;';
 
-		$links = array_map( 'TaxoTaxi::_array_map_buildLinks', $post->$column_name );
+		$links = array_map( __NAMESPACE__.'\array_map_build_links', $post->$column_name );
 		
 		// array_unique is needed because of duplicates when sorting by categories or post tags( beheader )
 		echo implode( ', ', array_unique($links) );
@@ -160,32 +162,6 @@ class TaxoTaxi{
 	}
 	
 	/*
-	*	handy if you have Behaeder installed
-	*	@param string 
-	*	@return string
-	*/
-	public static function posts_orderby( $sql ){
-		if( !isset($_GET['orderby']) || !array_key_exists($_GET['orderby'], self::$taxonomies) )
-			return $sql;
-		
-		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'asc' : 'desc';
-		$orderby = esc_sql( $_GET['orderby'] );
-		
-		$sql = "`{$orderby}_names` $order ";
-		return $sql;
-	}
-	
-	/*
-	*	just for debugging, view the sql query that populates the Edit table
-	*	@param string 
-	*	@return string
-	*/
-	public static function posts_request( $sql ){
-		//ddbug( $sql );
-		return $sql;
-	}
-	
-	/*
 	*	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
 	*	@param array WP_Post
 	*	@return array
@@ -216,9 +192,9 @@ class TaxoTaxi{
 														 'slug' => $slugs[$k], 
 														 'taxonomy' => $order[$k] );
 			}
-			
+			//var_dump($taxonomies);die();
 			$props = array_merge( $post->to_array(), $taxonomies );
-			$post = new WP_Post( (object) $props );
+			$post = new \WP_Post( (object) $props );
 		}
 		
 		return $posts;
@@ -236,22 +212,6 @@ class TaxoTaxi{
 		$columns = array_merge( $columns, $keys ); 
 		
 		return $columns;
-	}
-	
-	/*
-	*	fix bug in setting post_format query varaible
-	*	wp-includes/post.php function _post_format_request()
-	*		$tax = get_taxonomy( 'post_format' );
-	*		$qvs['post_type'] = $tax->object_type;
-	*		sets global $post_type to an array
-	*	@param array
-	*	@return array
-	*/
-	public static function request( $qvs ){
-		if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
-			$qvs['post_type'] = $qvs['post_type'][0];
-			
-		return $qvs;
 	}
 	
 	/*
@@ -273,22 +233,68 @@ class TaxoTaxi{
 			echo $html;
 		}
 	}
+}
+
+/*
+*	array map callback to build the link in the Edit table
+*	@param array
+*	@return string
+*/
+function array_map_build_links( $array ){
+	return '<a href="?post_type='.$array['post_type'].'&'.$array['taxonomy'].'='.$array['slug'].'">'.$array['name'].'</a>';
+}
 	
-	/*
-	*	array map callback to build the link in the Edit table
-	*	@param array
-	*	@return string
-	*/
-	public static function _array_map_buildLinks( $array ){
-		return '<a href="?post_type='.$array['post_type'].'&'.$array['taxonomy'].'='.$array['slug'].'">'.$array['name'].'</a>';
+/*
+*	array map callback
+*	@param object
+*	@return string
+*/
+function array_map_taxonomies( $object ){
+	return $object->labels->name;
+}
+
+/*
+*
+*/
+function get_taxonomies(){
+	static $taxonomies = NULL;
+	
+	if( !$taxonomies ){
+	
 	}
 	
-	/*
-	*	array map callback
-	*	@param object
-	*	@return string
-	*/
-	public static function _array_map_taxonomies( $object ){
-		return $object->labels->name;
-	}
+	return $taxonomies;
+}
+
+/*
+*	attached to ajax for quick edit
+*/
+function inline_save(){
+	
+}
+
+/*
+*	just for debugging, view the sql query that populates the Edit table
+*	@param string 
+*	@return string
+*/
+function posts_request( $sql ){
+	//var_dump( $sql );
+	return $sql;
+}
+
+/*
+*	fix bug in setting post_format query varaible
+*	wp-includes/post.php function _post_format_request()
+*		$tax = get_taxonomy( 'post_format' );
+*		$qvs['post_type'] = $tax->object_type;
+*		sets global $post_type to an array
+*	@param array
+*	@return array
+*/
+function request( $qvs ){
+	if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
+		$qvs['post_type'] = $qvs['post_type'][0];
+		
+	return $qvs;
 }
