@@ -17,7 +17,7 @@ Not tested with versions pre- 3.2 - requires PHP 5
 
 == Changelog ==
 = .8 =
-* Move to standard format, php >= 5.3 
+* Move to standard format, php >= 5.3, support quick edit
 
 = .76 =
 * Move to github
