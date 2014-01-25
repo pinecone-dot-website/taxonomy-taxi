@@ -13,19 +13,19 @@ function setup(){
 	require __DIR__.'/lib/walker-taxo-taxi.php';
 	require __DIR__.'/sql.php';
 	
+	// fix for tag = 0 in drop down borking wp_query
+	if( isset($_GET['tag']) && $_GET['tag'] === "0" )
+		unset( $_GET['tag'] );
+		
 	// set up post type and associated taxonomies
 	$post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : 'post';
 	$tax = get_object_taxonomies( $post_type, 'objects' );
 	
-	// don't show default taxonomies twice
-	unset( $tax['category'] );
-	unset( $tax['post_tag'] );
-	
 	taxonomies( $tax );
 	
 	// filters and actions
-	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns' );
-	add_filter( 'manage_posts_columns', __NAMESPACE__.'\manage_posts_columns' );
+	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns', 10, 1 );
+	add_filter( 'manage_posts_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	
 	add_action( 'manage_pages_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
 	add_action( 'manage_posts_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
@@ -34,29 +34,11 @@ function setup(){
 	add_filter( 'posts_groupby', __NAMESPACE__.'\posts_groupby', 10, 2 );
 	add_filter( 'posts_join', __NAMESPACE__.'\posts_join', 10, 2 );
 	
-	add_filter( 'posts_request', __NAMESPACE__.'\posts_request' );
-	add_filter( 'posts_results', __NAMESPACE__.'\posts_results' );
+	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 1 );
+	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
 
-	add_filter( 'request', __NAMESPACE__.'\request' );	
-	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts' );
-}
-
-/*
-*	array map callback to build the link in the Edit table
-*	@param array
-*	@return string
-*/
-function array_map_build_links( $array ){
-	return '<a href="?post_type='.$array['post_type'].'&'.$array['taxonomy'].'='.$array['slug'].'">'.$array['name'].'</a>';
-}
-	
-/*
-*	array map callback
-*	@param object
-*	@return string
-*/
-function array_map_taxonomies( $object ){
-	return $object->labels->name;
+	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
+	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
 }
 
 /*
@@ -64,92 +46,8 @@ function array_map_taxonomies( $object ){
 *	subvert wp_ajax_inline_save()
 */
 function inline_save(){
-	setup();
-	
-	check_ajax_referer( 'inlineeditnonce', '_inline_edit' );
-
-	if( !isset($_POST['post_ID']) || ! ( $post_id = (int) $_POST['post_ID'] ) )
-		wp_die();
-
-	if( 'page' == $_POST['post_type'] ){
-		if( !current_user_can( 'edit_page', $post_id ) )
-			wp_die( __( 'You are not allowed to edit this page.' ) );
-	} else {
-		if( !current_user_can( 'edit_post', $post_id ) )
-			wp_die( __( 'You are not allowed to edit this post.' ) );
-	}
-
-	if( $last = wp_check_post_lock( $post_id) ){
-		$last_user = get_userdata( $last );
-		$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
-		printf( $_POST['post_type'] == 'page' ? __( 'Saving is disabled: %s is currently editing this page.' ) : __( 'Saving is disabled: %s is currently editing this post.' ),	esc_html( $last_user_name ) );
-		wp_die();
-	}
-
-	$data = &$_POST;
-
-	$post = get_post( $post_id, ARRAY_A );
-	$post = wp_slash($post); //since it is from db
-
-	$data['content'] = $post['post_content'];
-	$data['excerpt'] = $post['post_excerpt'];
-
-	// rename
-	$data['user_ID'] = get_current_user_id();
-
-	if( isset($data['post_parent']) )
-		$data['parent_id'] = $data['post_parent'];
-
-	// status
-	if( isset($data['keep_private']) && 'private' == $data['keep_private'] )
-		$data['post_status'] = 'private';
-	else
-		$data['post_status'] = $data['_status'];
-
-	if( empty($data['comment_status']) )
-		$data['comment_status'] = 'closed';
-		
-	if( empty($data['ping_status']) )
-		$data['ping_status'] = 'closed';
-
-	// Hack: wp_unique_post_slug() doesn't work for drafts, so we will fake that our post is published.
-	if( !empty( $data['post_name'] ) && in_array( $post['post_status'], array( 'draft', 'pending')) ){
-		$post['post_status'] = 'publish';
-		$data['post_name'] = wp_unique_post_slug( $data['post_name'], 
-												  $post['ID'], 
-												  $post['post_status'], 
-												  $post['post_type'], 
-												  $post['post_parent'] );
-	}
-
-	// update the post
-	edit_post();
-	
-	$post_id = $_POST['post_ID'];
-	$post_type = $_POST['post_type']; 
-	
- 	$posts = get_posts( array('p' => $post_id, 
- 							  'post_type' => $post_type, 
- 							  'post_status' => 'any', 
- 							  'suppress_filters' => FALSE, 
- 							  'posts_per_page' => 1) ); 
- 	
- 	if( !isset($posts[0]) ) 
- 		return;
- 	
- 	$level = 0;
- 	$parent = $posts[0]->post_parent;
-
-	while( $parent > 0 ){
-		$parent_post = get_post( $parent );
-		$parent = $parent_post->post_parent;
-		$level++;
-	}
-							  
- 	$wp_list_table = _get_list_table( 'WP_Posts_List_Table', array('screen' => $_POST['screen']) ); 
- 	$wp_list_table->display_rows( array($posts[0]), $level ); 
- 	
- 	die();
+	require __DIR__.'/admin-ajax.php';
+	wp_ajax_inline_save();
 }
 
 /*
@@ -163,13 +61,18 @@ function manage_posts_columns( $headings ){
 	$keys = array_keys( $headings );
 	$key = array_search( 'categories', $keys );
 	
+	// going to replace stock columns with sortable ones
+	unset( $headings['categories'] );
+	unset( $headings['tags'] );
+	
 	// arbitary placement in table
 	if( !$key )
-		$key = 2;
+		$key = 3;
 	
-	// display the extra taxonomies after standard Categories
 	$a = array_slice( $headings, 0, $key );
-	$b = array_map( __NAMESPACE__.'\array_map_taxonomies', taxonomies() );
+	$b = array_map( function($taxonomy){
+		return $taxonomy->labels->name;
+	}, taxonomies() );
 	$c = array_slice( $headings, $key );
 	
 	$headings = array_merge( $a, $b, $c );
@@ -187,22 +90,50 @@ function manage_posts_columns( $headings ){
 function manage_posts_custom_column( $column_name, $post_id ){
 	global $post;
 	
-	if( !isset($post->$column_name) || !count($post->$column_name) )
+	if( !isset($post->taxonomy_taxi[$column_name]) || !count($post->taxonomy_taxi[$column_name]) )
 		return print '&nbsp;';
-
-	$links = array_map( __NAMESPACE__.'\array_map_build_links', $post->$column_name );
 	
-	// array_unique is needed because of duplicates when sorting by categories or post tags( beheader )
-	echo implode( ', ', array_unique($links) );
+	$links = array_map( function($column){
+		return '<a href="?post_type='.$column['post_type'].'&amp;'.$column['taxonomy'].'='.$column['slug'].'">'.$column['name'].'</a>';
+	}, $post->taxonomy_taxi[$column_name] );
+
+	echo implode( ', ', $links );
 }
 
 /*
-*	just for debugging, view the sql query that populates the Edit table
-*	@param string 
-*	@return string
+*	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
+*	@param array WP_Post
+*	@return array
 */
-function posts_request( $sql ){
-	return $sql;
+function posts_results( $posts ){
+	foreach( $posts as &$post ){		
+		$taxonomies = array();
+		
+		foreach( taxonomies() as $tax ){
+			$tax_name = esc_sql( $tax->name );
+			$taxonomies[$tax_name] = array();
+			
+			$col = $tax_name.'_slugs';
+			$slugs = explode( ',', $post->$col );
+			
+			$col = $tax_name.'_names';
+			$names = explode( ',', $post->$col );
+			
+			foreach( $names as $k=>$name){
+				$taxonomies[$tax_name][] = array(
+					'name' => $name,
+					'post_type' => $post->post_type,
+					'slug' => $slugs[$k], 
+					'taxonomy' => $tax_name
+				);
+			}
+		}
+		
+		$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
+		$post = new \WP_Post( (object) $props );
+	}
+	
+	return $posts;
 }
 
 /*
@@ -241,12 +172,15 @@ function register_sortable_columns( $columns ){
 */
 function restrict_manage_posts(){
 	foreach( taxonomies() as $taxonomy => $props ){
+		if( $taxonomy == 'category' )
+			continue;
+				
 		$html = wp_dropdown_categories( array(
 			'echo' => 0,
 			'hierarchical' => TRUE,
-			'name' => $taxonomy,
-			'selected' => isset( $_GET[$taxonomy] ) ? $_GET[$taxonomy] : FALSE,
-			'show_option_all' => 'View All '.$props->labels->all_items,
+			'name' => $props->query_var,
+			'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
+			'show_option_all' => 'View '.$props->labels->all_items,
 			'taxonomy' => $taxonomy,
 			'walker' => new Walker_Taxo_Taxi
 		) );
