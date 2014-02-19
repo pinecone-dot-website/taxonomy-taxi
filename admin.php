@@ -174,17 +174,24 @@ function restrict_manage_posts(){
 	foreach( taxonomies() as $taxonomy => $props ){
 		if( $taxonomy == 'category' )
 			continue;
-				
+		
+		$label = array_filter( array(
+			$props->labels->all_items, 
+			$props->name
+		) );
+			
 		$html = wp_dropdown_categories( array(
 			'echo' => 0,
+			'hide_empty' => FALSE,
 			'hierarchical' => TRUE,
 			'name' => $props->query_var,
 			'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
-			'show_option_all' => 'View '.$props->labels->all_items,
+			'show_option_all' => 'View '.reset($label),
 			'taxonomy' => $taxonomy,
 			'walker' => new Walker_Taxo_Taxi
 		) );
 		
+		//dbug($props);
 		echo $html;
 	}
 }
