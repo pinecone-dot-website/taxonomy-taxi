@@ -57,17 +57,15 @@ function inline_save(){
 *	@return array $headings
 */
 function manage_posts_columns( $headings ){
-	// default is to show before Categories
+	//  arbitary placement in table if it cant replace categories
 	$keys = array_keys( $headings );
 	$key = array_search( 'categories', $keys );
-	
+	if( !$key )
+		$key = 3;
+		
 	// going to replace stock columns with sortable ones
 	unset( $headings['categories'] );
 	unset( $headings['tags'] );
-	
-	// arbitary placement in table
-	if( !$key )
-		$key = 3;
 	
 	$a = array_slice( $headings, 0, $key );
 	$b = array_map( function($taxonomy){
@@ -111,7 +109,6 @@ function posts_results( $posts ){
 		
 		foreach( taxonomies() as $tax ){
 			$tax_name = esc_sql( $tax->name );
-			$taxonomies[$tax_name] = array();
 			
 			$col = $tax_name.'_slugs';
 			$slugs = explode( ',', $post->$col );
@@ -119,14 +116,17 @@ function posts_results( $posts ){
 			$col = $tax_name.'_names';
 			$names = explode( ',', $post->$col );
 			
-			foreach( $names as $k=>$name){
-				$taxonomies[$tax_name][] = array(
-					'name' => $name,
+			$objects = array_fill( 0, count($names), 0 );
+			array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
+				$v = array(
+					'name' => $names[$k],
 					'post_type' => $post->post_type,
 					'slug' => $slugs[$k], 
 					'taxonomy' => $tax_name
 				);
-			}
+			});
+			
+			$taxonomies[$tax_name] = $objects;
 		}
 		
 		$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
