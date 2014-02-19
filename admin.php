@@ -191,7 +191,6 @@ function restrict_manage_posts(){
 			'walker' => new Walker_Taxo_Taxi
 		) );
 		
-		//dbug($props);
 		echo $html;
 	}
 }
