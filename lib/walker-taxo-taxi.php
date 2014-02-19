@@ -5,7 +5,7 @@ namespace taxonomytaxi;
 /*
 *	builds nested drop down selects in wp-admin/edit.php
 *	sets value to be term slug rather than term id
-*	Version: .8
+*	Version: .85
 */
 class Walker_Taxo_Taxi extends \Walker_CategoryDropdown{
 	
@@ -18,7 +18,6 @@ class Walker_Taxo_Taxi extends \Walker_CategoryDropdown{
 		}
 		
 		$output .= "<option class=\"level-$depth\" value=\"".$category->slug."\"";
-		//ddbug( $args['selected'] );
 		
 		if( $category->slug === $args['selected'] )
 			$output .= ' selected="selected"';
