@@ -142,6 +142,7 @@ function posts_results( $posts ){
 *		$tax = get_taxonomy( 'post_format' );
 *		$qvs['post_type'] = $tax->object_type;
 *		sets global $post_type to an array
+*	attached to `request` filter
 *	@param array
 *	@return array
 */
@@ -159,9 +160,11 @@ function request( $qvs ){
 */
 function register_sortable_columns( $columns ){
 	$keys = array_keys( taxonomies() );
-	$keys = array_combine( $keys, $keys );
 	
-	$columns = array_merge( $columns, $keys ); 
+	if( count($keys) ){
+		$keys = array_combine( $keys, $keys );
+		$columns = array_merge( $columns, $keys ); 
+	}
 	
 	return $columns;
 }
@@ -196,8 +199,8 @@ function restrict_manage_posts(){
 }
 
 /*
-*
-*	@param
+*	set and get custom taxonomies for edit screen
+*	@param array
 *	@return array
 */
 function taxonomies( $tax = NULL ){

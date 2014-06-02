@@ -3,7 +3,7 @@ Contributors: postpostmodern, pinecone-dot-io
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.2
-Tested up to: 3.9-alpha
+Tested up to: 3.9.1
 Stable tag: trunk
 
 == Description ==
@@ -16,14 +16,17 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .89 =
+* Fix warnings when viewing post type with zero taxonomies
+
 = .88 =
 * Show terms with 0 count, fix when taxonomy does not have a proper 'all_items' label
 
 = .85 =
-* Move to standard format, php >= 5.3, support quick edit
+* Support quick edit
 
 = .8 =
-* Move to standard format, php >= 5.3, support quick edit
+* Move to standard format, php >= 5.3
 
 = .76 =
 * Move to github
