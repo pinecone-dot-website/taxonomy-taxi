@@ -25,6 +25,7 @@ function setup(){
 	
 	// filters and actions
 	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns', 10, 1 );
+	add_filter( 'manage_pages_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	add_filter( 'manage_posts_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	
 	add_action( 'manage_pages_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
@@ -104,7 +105,8 @@ function manage_posts_custom_column( $column_name, $post_id ){
 *	@return array
 */
 function posts_results( $posts ){
-	foreach( $posts as &$post ){		
+	// assigning to &$post was not working on wpengine...
+	foreach( $posts as $k=>$post ){		
 		$taxonomies = array();
 		
 		foreach( taxonomies() as $tax ){
@@ -130,9 +132,10 @@ function posts_results( $posts ){
 		}
 		
 		$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
-		$post = new \WP_Post( (object) $props );
+		
+		$posts[$k] = new \WP_Post( (object) $props );
 	}
-	
+		
 	return $posts;
 }
 
