@@ -34,6 +34,7 @@ function setup(){
 	add_filter( 'posts_fields', __NAMESPACE__.'\posts_fields', 10, 2 );
 	add_filter( 'posts_groupby', __NAMESPACE__.'\posts_groupby', 10, 2 );
 	add_filter( 'posts_join', __NAMESPACE__.'\posts_join', 10, 2 );
+	add_filter( 'posts_orderby', __NAMESPACE__.'\posts_orderby', 10, 2 );
 	
 	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 1 );
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
@@ -120,6 +121,17 @@ function posts_results( $posts ){
 			
 			$objects = array_fill( 0, count($names), 0 );
 			array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
+				
+				switch( $tax_name ){
+					case 'category':
+						$tax_name = 'category_name';
+						break;
+						
+					case 'post_tag':
+						$tax_name = 'tag';
+						break;
+				}
+						
 				$v = array(
 					'name' => $names[$k],
 					'post_type' => $post->post_type,

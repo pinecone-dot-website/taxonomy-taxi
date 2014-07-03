@@ -61,11 +61,26 @@ function posts_join( $sql, &$wp_query ){
 }
 
 /*
+*	filter for `posts_orderby` 
+*	@param string 
+*	@param WP_Query
+*	@return string
+*/
+function posts_orderby( $sql, &$wp_query ){
+	global $wpdb;
+	
+	if( isset($wp_query->query_vars['orderby']) )
+		$sql = $wp_query->query_vars['orderby']."_slugs ".$wp_query->query_vars['order'];
+	
+	return $sql;
+}
+
+/*
 *	just for debugging, view the sql query that populates the Edit table
 *	@param string 
 *	@return string
 */
 function posts_request( $sql ){
-	//var_dump($sql);
+	//ddbug($sql);
 	return $sql;
 }
