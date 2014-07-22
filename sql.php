@@ -69,7 +69,7 @@ function posts_join( $sql, &$wp_query ){
 function posts_orderby( $sql, &$wp_query ){
 	global $wpdb;
 	
-	if( isset($wp_query->query_vars['orderby']) )
+	if( isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], taxonomies()) )
 		$sql = $wp_query->query_vars['orderby']."_slugs ".$wp_query->query_vars['order'];
 	
 	return $sql;
