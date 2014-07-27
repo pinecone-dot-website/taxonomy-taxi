@@ -22,7 +22,7 @@ function wp_ajax_inline_save(){
 			wp_die( __( 'You are not allowed to edit this post.') );
 	}
 
-	if( $last = wp_check_post_lock( $post_id) ){
+	if( $last = wp_check_post_lock($post_id) ){
 		$last_user = get_userdata( $last );
 		$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
 		printf( $_POST['post_type'] == 'page' ? __( 'Saving is disabled: %s is currently editing this page.' ) : __( 'Saving is disabled: %s is currently editing this post.' ),	esc_html( $last_user_name) );

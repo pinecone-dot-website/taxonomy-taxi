@@ -200,7 +200,7 @@ function restrict_manage_posts(){
 			
 		$html = wp_dropdown_categories( array(
 			'echo' => 0,
-			//'hide_empty' => FALSE,
+			'hide_empty' => TRUE,
 			'hide_if_empty' => TRUE,
 			'hierarchical' => TRUE,
 			'name' => $props->query_var,

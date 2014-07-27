@@ -3,7 +3,7 @@
 Plugin Name:	Taxonomy Taxi
 Plugin URI: 	http://wordpress.org/plugins/taxonomy-taxi/
 Description:	Show custom taxonomies in /wp-admin/edit.php automatically
-Version: 		.96
+Version: 		.97
 Author: 		postpostmodern, pinecone-dot-io
 Author URI: 	http://pinecone.io
 Photo Credit:	http://www.flickr.com/photos/photos_mweber/
