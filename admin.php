@@ -25,6 +25,7 @@ function setup(){
 	
 	// filters and actions
 	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns', 10, 1 );
+	add_filter( 'manage_pages_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	add_filter( 'manage_posts_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	
 	add_action( 'manage_pages_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
@@ -33,6 +34,7 @@ function setup(){
 	add_filter( 'posts_fields', __NAMESPACE__.'\posts_fields', 10, 2 );
 	add_filter( 'posts_groupby', __NAMESPACE__.'\posts_groupby', 10, 2 );
 	add_filter( 'posts_join', __NAMESPACE__.'\posts_join', 10, 2 );
+	add_filter( 'posts_orderby', __NAMESPACE__.'\posts_orderby', 10, 2 );
 	
 	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 1 );
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
@@ -104,7 +106,8 @@ function manage_posts_custom_column( $column_name, $post_id ){
 *	@return array
 */
 function posts_results( $posts ){
-	foreach( $posts as &$post ){		
+	// assigning to &$post was not working on wpengine...
+	foreach( $posts as $k=>$post ){		
 		$taxonomies = array();
 		
 		foreach( taxonomies() as $tax ){
@@ -118,6 +121,17 @@ function posts_results( $posts ){
 			
 			$objects = array_fill( 0, count($names), 0 );
 			array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
+				
+				switch( $tax_name ){
+					case 'category':
+						$tax_name = 'category_name';
+						break;
+						
+					case 'post_tag':
+						$tax_name = 'tag';
+						break;
+				}
+						
 				$v = array(
 					'name' => $names[$k],
 					'post_type' => $post->post_type,
@@ -130,9 +144,10 @@ function posts_results( $posts ){
 		}
 		
 		$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
-		$post = new \WP_Post( (object) $props );
+		
+		$posts[$k] = new \WP_Post( (object) $props );
 	}
-	
+		
 	return $posts;
 }
 
@@ -185,7 +200,8 @@ function restrict_manage_posts(){
 			
 		$html = wp_dropdown_categories( array(
 			'echo' => 0,
-			'hide_empty' => FALSE,
+			//'hide_empty' => FALSE,
+			'hide_if_empty' => TRUE,
 			'hierarchical' => TRUE,
 			'name' => $props->query_var,
 			'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,

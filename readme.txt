@@ -16,6 +16,12 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .95 =
+* Fix ordering in sortable column
+
+= .91 =
+* Fix links to categories and tags
+
 = .89 =
 * Fix warnings when viewing post type with zero taxonomies
 
