@@ -3,7 +3,7 @@ Contributors: postpostmodern, pinecone-dot-io
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.2
-Tested up to: 3.9.1
+Tested up to: 4.0.beta2
 Stable tag: trunk
 
 == Description ==
