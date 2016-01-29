@@ -20,7 +20,7 @@ function setup(){
 	// set up post type and associated taxonomies
 	$post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : 'post';
 	$tax = get_object_taxonomies( $post_type, 'objects' );
-	
+		
 	taxonomies( $tax );
 	
 	// filters and actions
@@ -36,8 +36,10 @@ function setup(){
 	add_filter( 'posts_join', __NAMESPACE__.'\posts_join', 10, 2 );
 	add_filter( 'posts_orderby', __NAMESPACE__.'\posts_orderby', 10, 2 );
 	
-	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 1 );
+	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 2 );
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
+
+	add_filter( 'pre_get_posts', __NAMESPACE__.'\pre_get_posts', 10, 1 );
 
 	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
 	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
@@ -49,6 +51,7 @@ function setup(){
 */
 function inline_save(){
 	require __DIR__.'/admin-ajax.php';
+
 	wp_ajax_inline_save();
 }
 

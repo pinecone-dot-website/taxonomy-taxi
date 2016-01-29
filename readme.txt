@@ -16,6 +16,12 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .98 =
+* Initial support showing posts that have no terms in taxonomy, works best with custom taxonomy
+
+= .97 =
+* forgot what this release was
+
 = .96 =
 * Prep for 1.0 release
 
