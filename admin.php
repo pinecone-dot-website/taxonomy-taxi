@@ -2,19 +2,16 @@
 
 namespace taxonomytaxi;
 
-add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\inline_save', 0 );
-add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
-
-/*
+/**
 *	called on `load-edit.php` action
-*	sets up class variables and the rest of the actions / filters
+*	sets up the rest of the actions / filters
 */
 function setup(){
 	require __DIR__.'/lib/walker-taxo-taxi.php';
 	require __DIR__.'/sql.php';
-	
+
 	// fix for tag = 0 in drop down borking wp_query
-	if( isset($_GET['tag']) && $_GET['tag'] === "0" )
+	if( filter_input(INPUT_GET, 'tag') === "0" )
 		unset( $_GET['tag'] );
 		
 	// set up post type and associated taxonomies
@@ -42,8 +39,9 @@ function setup(){
 	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
 	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
 }
+add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
 
-/*
+/**
 *	attached to ajax for quick edit
 *	subvert wp_ajax_inline_save()
 */
@@ -51,8 +49,9 @@ function inline_save(){
 	require __DIR__.'/admin-ajax.php';
 	wp_ajax_inline_save();
 }
+add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\inline_save', 0 );
 
-/*
+/**
 *	attached to `manage_posts_columns` filter
 *	adds columns for custom taxonomies in Edit table
 *	@param array $headings
@@ -63,7 +62,7 @@ function manage_posts_columns( $headings ){
 	$keys = array_keys( $headings );
 	$key = array_search( 'categories', $keys );
 	if( !$key )
-		$key = 3;
+		$key = max( 1, count($keys) );
 		
 	// going to replace stock columns with sortable ones
 	unset( $headings['categories'] );
@@ -80,7 +79,7 @@ function manage_posts_columns( $headings ){
 	return $headings;
 }
 
-/*
+/**
 *	attached to `manage_posts_custom_column` action
 *	echos column data inside each table cell
 *	@param string 
@@ -94,13 +93,18 @@ function manage_posts_custom_column( $column_name, $post_id ){
 		return print '&nbsp;';
 	
 	$links = array_map( function($column){
-		return '<a href="?post_type='.$column['post_type'].'&amp;'.$column['taxonomy'].'='.$column['slug'].'">'.$column['name'].'</a>';
+		return sprintf( '<a href="?post_type=%s&amp;%s=%s">%s</a>', 
+			$column['post_type'],
+			$column['taxonomy'],
+			$column['slug'],
+			$column['name'] 
+		);
 	}, $post->taxonomy_taxi[$column_name] );
 
 	echo implode( ', ', $links );
 }
 
-/*
+/**
 *	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
 *	@param array WP_Post
 *	@return array
@@ -121,7 +125,6 @@ function posts_results( $posts ){
 			
 			$objects = array_fill( 0, count($names), 0 );
 			array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
-				
 				switch( $tax_name ){
 					case 'category':
 						$tax_name = 'category_name';
@@ -151,7 +154,7 @@ function posts_results( $posts ){
 	return $posts;
 }
 
-/*
+/**
 *	fix bug in setting post_format query varaible
 *	wp-includes/post.php function _post_format_request()
 *		$tax = get_taxonomy( 'post_format' );
@@ -168,7 +171,7 @@ function request( $qvs ){
 	return $qvs;
 }
 
-/*
+/**
 *	register custom taxonomies for sortable columns
 *	@param array
 *	@return array
@@ -184,7 +187,7 @@ function register_sortable_columns( $columns ){
 	return $columns;
 }
 
-/*
+/**
 *	action for `restrict_manage_posts` 
 *	to display drop down selects for custom taxonomies
 */
@@ -214,7 +217,7 @@ function restrict_manage_posts(){
 	}
 }
 
-/*
+/**
 *	set and get custom taxonomies for edit screen
 *	@param array
 *	@return array
