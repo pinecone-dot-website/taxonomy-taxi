@@ -1,13 +1,13 @@
 <?php
 
-namespace taxonomytaxi;
+namespace Taxonomy_Taxi;
 
 /**
 *	called on `load-edit.php` action
 *	sets up the rest of the actions / filters
 */
 function setup(){
-	require __DIR__.'/lib/walker-taxo-taxi.php';
+	require __DIR__.'/lib/Walker_Taxo_Taxi.php';
 	require __DIR__.'/sql.php';
 
 	// fix for tag = 0 in drop down borking wp_query

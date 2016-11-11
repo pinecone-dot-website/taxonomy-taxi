@@ -1,6 +1,6 @@
 <?php
 
-namespace taxonomytaxi;
+namespace Taxonomy_Taxi;
 
 /**
 *	builds nested drop down selects in wp-admin/edit.php

@@ -1,6 +1,6 @@
 <?php
 
-namespace taxonomytaxi;
+namespace Taxonomy_Taxi;
 
 /*
 *

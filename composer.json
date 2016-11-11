@@ -8,6 +8,9 @@
         "email": "postpostmodern@gmail.com"
       }
     ],
+    "autoload": {
+        "psr-4": {"Taxonomy_Taxi\\": "lib/"}
+    },
     "require": {
         "composer/installers": "~1.0"
     }

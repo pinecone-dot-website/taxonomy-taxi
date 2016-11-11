@@ -1,6 +1,6 @@
 <?php
 
-namespace taxonomytaxi;
+namespace Taxonomy_Taxi;
 
 /*
 *	filter for `posts_fields` to select joined taxonomy data into the main query
