@@ -3,7 +3,7 @@ Contributors: postpostmodern, pinecone-dot-io
 Donate link: http://www.heifer.org/
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.2
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: trunk
 
 == Description ==
@@ -16,6 +16,9 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .9.8 =
+* Initial support to filter on having no taxonomies
+
 = .9.7.1 =
 * Standardizing junk, add composer
 
