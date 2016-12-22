@@ -7,6 +7,8 @@ namespace Taxonomy_Taxi;
 *	sets up the rest of the actions / filters
 */
 function setup(){
+	// @todo autoload
+	require __DIR__.'/lib/Query.php';
 	require __DIR__.'/lib/Walker_Taxo_Taxi.php';
 	require __DIR__.'/sql.php';
 
@@ -19,7 +21,9 @@ function setup(){
 	$tax = get_object_taxonomies( $post_type, 'objects' );
 	
 	taxonomies( $tax );
-	
+
+	add_filter( 'request', __NAMESPACE__.'\Query::request' );
+
 	// filters and actions
 	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns', 10, 1 );
 	add_filter( 'manage_pages_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
@@ -28,18 +32,22 @@ function setup(){
 	add_action( 'manage_pages_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
 	add_action( 'manage_posts_custom_column', __NAMESPACE__.'\manage_posts_custom_column', 10, 2 );
 	
+	add_filter( 'pre_get_posts', __NAMESPACE__.'\Query::pre_get_posts', 10, 1 );
+
 	add_filter( 'posts_fields', __NAMESPACE__.'\posts_fields', 10, 2 );
 	add_filter( 'posts_groupby', __NAMESPACE__.'\posts_groupby', 10, 2 );
 	add_filter( 'posts_join', __NAMESPACE__.'\posts_join', 10, 2 );
 	add_filter( 'posts_orderby', __NAMESPACE__.'\posts_orderby', 10, 2 );
-	
-	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 1 );
+
+	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 2 );
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
 
 	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
 	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
 
 	add_filter( 'disable_categories_dropdown', '__return_true' );
+
+	
 }
 add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
 
@@ -195,8 +203,6 @@ function register_sortable_columns( $columns ){
 */
 function restrict_manage_posts(){
 	foreach( taxonomies() as $taxonomy => $props ){
-		
-		
 		$label = array_filter( array(
 			$props->labels->all_items, 
 			$props->name
@@ -210,6 +216,7 @@ function restrict_manage_posts(){
 			'name' => $props->query_var,
 			'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
 			'show_option_all' => 'View '.reset($label),
+			'show_option_none' => '[None]',
 			'taxonomy' => $taxonomy,
 			'walker' => new Walker_Taxo_Taxi
 		) );

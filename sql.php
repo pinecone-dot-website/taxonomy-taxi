@@ -29,7 +29,7 @@ function posts_fields( $sql, &$wp_query ){
 	return $sql;
 }
 
-/*
+/**
 *	filter for `posts_groupby` to group query by post id
 *	@param string 
 *	@param WP_Query
@@ -77,10 +77,10 @@ function posts_orderby( $sql, &$wp_query ){
 
 /**
 *	just for debugging, view the sql query that populates the Edit table
+*	@param WP_Query
 *	@param string 
 *	@return string
 */
-function posts_request( $sql ){
-	//ddbug($sql);
+function posts_request( $sql, &$wp_query ){
 	return $sql;
 }
