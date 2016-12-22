@@ -42,7 +42,7 @@ function posts_groupby( $sql, &$wp_query ){
 	return $sql;
 }
 
-/*
+/**
 *	filter for `posts_join` to join taxonomy data into the main query
 *	@param string 
 *	@param WP_Query
@@ -60,7 +60,7 @@ function posts_join( $sql, &$wp_query ){
 	return $sql;
 }
 
-/*
+/**
 *	filter for `posts_orderby` 
 *	@param string 
 *	@param WP_Query
@@ -75,7 +75,7 @@ function posts_orderby( $sql, &$wp_query ){
 	return $sql;
 }
 
-/*
+/**
 *	just for debugging, view the sql query that populates the Edit table
 *	@param string 
 *	@return string

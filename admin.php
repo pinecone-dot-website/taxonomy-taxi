@@ -38,6 +38,8 @@ function setup(){
 
 	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
 	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
+
+	add_filter( 'disable_categories_dropdown', '__return_true' );
 }
 add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
 
@@ -193,8 +195,7 @@ function register_sortable_columns( $columns ){
 */
 function restrict_manage_posts(){
 	foreach( taxonomies() as $taxonomy => $props ){
-		if( $taxonomy == 'category' )
-			continue;
+		
 		
 		$label = array_filter( array(
 			$props->labels->all_items, 
