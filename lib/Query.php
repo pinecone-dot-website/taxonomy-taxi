@@ -45,6 +45,9 @@ class Query{
 		if( count($wp_query->query_vars['tax_query']) > 1 && !isset($wp_query->query_vars['tax_query']['relation']) )
 			$wp_query->query_vars['tax_query']['relation'] = 'AND';
 
+		// 'id=>parent' or 'ids' bypasses `posts_results` filter
+		unset( $wp_query->query_vars['fields'] );
+
 		return $wp_query;
 	}
 }
