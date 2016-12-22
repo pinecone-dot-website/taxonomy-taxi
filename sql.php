@@ -2,7 +2,7 @@
 
 namespace Taxonomy_Taxi;
 
-/*
+/**
 *	filter for `posts_fields` to select joined taxonomy data into the main query
 *	@param string 
 *	@param WP_Query

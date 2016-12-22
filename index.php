@@ -1,6 +1,6 @@
 <?php
 
-namespace taxonomytaxi;
+namespace Taxonomy_Taxi;
 
 if( is_admin() )
 	require __DIR__.'/admin.php';
