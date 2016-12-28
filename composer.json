@@ -1,7 +1,7 @@
 {
     "name": "pinecone-dot-website/taxonomy-taxi",
     "type": "wordpress-plugin",
-    "license": "",
+    "license": "GPL-2.0+",
     "authors": [
       {
         "name": "Eric Eaglstun",
