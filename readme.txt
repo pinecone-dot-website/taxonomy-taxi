@@ -1,6 +1,6 @@
 === Taxonomy Taxi ===
 Contributors: postpostmodern, pinecone-dot-io
-Donate link: http://www.heifer.org/
+Donate link: https://cash.me/$EricEaglstun
 Tags: custom taxonomies, taxonomy
 Requires at least: 3.2
 Tested up to: 4.7
