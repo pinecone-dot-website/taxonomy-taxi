@@ -2,6 +2,19 @@
 
 namespace Taxonomy_Taxi;
 
+/*
+*	setup page for dbug settings
+*	add link to settings page under 'Settings' admin sidebar
+*	update settings from $_POST
+*	attached to `admin_menu` action
+*/
+function admin_menu(){
+	add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __NAMESPACE__.'\Settings_Page::view' );
+}
+add_action( 'admin_menu', __NAMESPACE__.'\admin_menu' );
+
+add_action( 'admin_init', __NAMESPACE__.'\Settings_Page::register' );
+
 /**
 *	called on `load-edit.php` action
 *	sets up the rest of the actions / filters
