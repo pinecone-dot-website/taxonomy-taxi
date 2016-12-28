@@ -41,7 +41,7 @@ class Settings_Page {
 	}
 
 	/**
-	*
+	*	render the ui for each post type row
 	*	@param string
 	*	@return 
 	*/
@@ -65,8 +65,6 @@ class Settings_Page {
 
 			$options = array_diff( $all, $options );
 		}
-
-		//dbug( $form_data );
 
 		return $form_data;
 	}

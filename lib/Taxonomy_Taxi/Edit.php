@@ -2,6 +2,7 @@
 
 namespace Taxonomy_Taxi;
 
+// should only be used on wp-admin/edit.php
 class Edit{
 	protected static $post_type = '';
 	protected static $taxonomies = array();
@@ -15,13 +16,16 @@ class Edit{
 		self::set_taxonomies( $post_type );
 
 		add_filter( 'disable_categories_dropdown', '__return_true' );
-		
+		add_action( 'restrict_manage_posts', __CLASS__.'::restrict_manage_posts', 10, 1 );
+
 		// edit.php columns
 		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );	
 		add_filter( 'manage_pages_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
 		add_filter( 'manage_posts_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
 		add_action( 'manage_pages_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
 		add_action( 'manage_posts_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
+
+		add_filter( 'request', __CLASS__.'::request', 10, 1 );	
 	}
 
 	/**
@@ -95,6 +99,46 @@ class Edit{
 		}
 
 		return $columns;
+	}
+
+	/**
+	*	fix bug in setting post_format query varaible
+	*	wp-includes/post.php function _post_format_request()
+	*		$tax = get_taxonomy( 'post_format' );
+	*		$qvs['post_type'] = $tax->object_type;
+	*		sets global $post_type to an array
+	*	attached to `request` filter
+	*	@param array
+	*	@return array
+	*/
+	public static function request( $qvs ){
+		if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
+			$qvs['post_type'] = $qvs['post_type'][0];
+			
+		return $qvs;
+	}
+
+	/**
+	*	action for `restrict_manage_posts` 
+	*	to display drop down selects for custom taxonomies
+	*/
+	public static function restrict_manage_posts(){
+		foreach( Settings::get_active_for_post_type(self::$post_type) as $taxonomy => $props ){		
+			$html = wp_dropdown_categories( array(
+				'echo' => 0,
+				'hide_empty' => TRUE,
+				'hide_if_empty' => TRUE,
+				'hierarchical' => TRUE,
+				'name' => $props->query_var,
+				'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
+				'show_option_all' => 'View '.$props->view_all,
+				'show_option_none' => '[None]',
+				'taxonomy' => $taxonomy,
+				'walker' => new Walker_Taxo_Taxi
+			) );
+			
+			echo $html;
+		}
 	}
 
 	public static function get_taxonomies(){

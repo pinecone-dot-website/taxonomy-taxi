@@ -6,7 +6,7 @@ if( is_admin() )
 	require __DIR__.'/admin.php';
 
 /**
-*
+*	PSR-4 
 *	@param string
 */
 function autoload( $class ){
@@ -21,7 +21,7 @@ function autoload( $class ){
 spl_autoload_register( __NAMESPACE__.'\autoload' );
 
 /**
-*	render a page into wherever
+*	render a page into wherever (admin)
 *	@param string
 *	@param object|array
 */
@@ -41,6 +41,10 @@ function render( $_template, $vars = array() ){
 	return $html;
 }
 
+/**
+*	gets the version of the plugin
+*	@return string
+*/
 function version(){
 	$data = get_plugin_data( __DIR__.'/_plugin.php' );
 	return $data['Version'];

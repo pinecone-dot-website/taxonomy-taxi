@@ -31,10 +31,17 @@ class Settings{
 
 		$settings = array();
 		foreach( $taxonomies as $tax => $props ){
+			$view_all = array_filter( array(
+				$props->labels->all_items, 
+				$props->name
+			) );
+		
 			$settings[$tax] = (object) array(
 				'checked' => in_array( $tax, $checked ),
 				'label' => $props->label,
-				'name' => $tax
+				'query_var' => $props->query_var,
+				'name' => $tax,
+				'view_all' => reset( $view_all )
 			);
 		}
 

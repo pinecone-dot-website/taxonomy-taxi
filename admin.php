@@ -33,9 +33,6 @@ function setup(){
 	
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
 
-	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
-	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
-
 	Edit::init( $post_type );
 	Sql::init();
 }
@@ -99,63 +96,4 @@ function posts_results( $posts ){
 	}
 		
 	return $posts;
-}
-
-/**
-*	fix bug in setting post_format query varaible
-*	wp-includes/post.php function _post_format_request()
-*		$tax = get_taxonomy( 'post_format' );
-*		$qvs['post_type'] = $tax->object_type;
-*		sets global $post_type to an array
-*	attached to `request` filter
-*	@param array
-*	@return array
-*/
-function request( $qvs ){
-	if( isset($qvs['post_type']) && is_array($qvs['post_type']) )
-		$qvs['post_type'] = $qvs['post_type'][0];
-		
-	return $qvs;
-}
-
-/**
-*	action for `restrict_manage_posts` 
-*	to display drop down selects for custom taxonomies
-*/
-function restrict_manage_posts(){
-	foreach( Edit::get_taxonomies() as $taxonomy => $props ){
-		$label = array_filter( array(
-			$props->labels->all_items, 
-			$props->name
-		) );
-			
-		$html = wp_dropdown_categories( array(
-			'echo' => 0,
-			'hide_empty' => TRUE,
-			'hide_if_empty' => TRUE,
-			'hierarchical' => TRUE,
-			'name' => $props->query_var,
-			'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
-			'show_option_all' => 'View '.reset($label),
-			'show_option_none' => '[None]',
-			'taxonomy' => $taxonomy,
-			'walker' => new Walker_Taxo_Taxi
-		) );
-		
-		echo $html;
-	}
-}
-
-/**
-*	set and get custom taxonomies for edit screen
-*	@param array
-*	@return array
-*/
-function taxonomies( $tax = NULL ){
-	static $taxonomies = NULL;
-	
-	if( !is_null($tax) )
-		$taxonomies = $tax;
-		
-	return $taxonomies;
 }
