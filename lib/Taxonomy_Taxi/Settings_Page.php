@@ -14,19 +14,27 @@ class Settings_Page {
 			'taxonomy_taxi'
 		);
 	 	
-	 	// Add the field with the names and function to use for our new
-	 	// settings, put it in our new section
-	 	add_settings_field(
-			'taxonomy_taxi_setting_name',
-			'Example setting Name',
-			'',
-			'taxonomy_taxi',
-			'taxonomy_taxi_settings_section'
-		);
+	 	$post_types = get_post_types( array(
+	 		'show_ui' => TRUE
+	 	), 'objects' );
+
+	 	foreach( $post_types as $post_type ){
+		 	add_settings_field(
+				'taxonomy_taxi_setting_name-'.$post_type->name,
+				$post_type->labels->name,
+				function() use($post_type){
+					self::post_type( $post_type->name );
+				},
+				'taxonomy_taxi',
+				'taxonomy_taxi_settings_section'
+			);
+
+			register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
+	 	}
 	}
 
 	/**
-	*
+	*	callback for add_settings_section to render description field
 	*/
 	public static function description(){
 		echo  sprintf( 'version %s', version() );
@@ -34,10 +42,32 @@ class Settings_Page {
 
 	/**
 	*
+	*	@param string
+	*	@return 
+	*/
+	public static function post_type( $post_type = '' ){
+		$taxonomies = get_object_taxonomies( $post_type, 'objects' ); 
+
+		echo render( 'admin/options-general_post-type', array(
+			'post_type' => $post_type,
+			'taxonomies' => $taxonomies
+		) );
+	}
+
+	/**
+	*
+	*	@param array
+	*	@return array
+	*/
+	public static function save( $form_data ){
+		//dbug( $form_data );
+		return $form_data;
+	}
+
+	/**
+	*	callback for add_settings_field to render form ui
 	*/
 	public static function view(){
 		echo render( 'admin/options-general', array() );
 	}
-
-
 }
