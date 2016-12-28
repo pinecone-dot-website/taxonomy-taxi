@@ -6,7 +6,7 @@ class Settings_Page {
 	/**
 	*
 	*/
-	public static function register(){
+	public static function register_page(){
 		add_settings_section(
 			'taxonomy_taxi_settings_section',
 			'Taxonomy Taxi',
@@ -28,16 +28,16 @@ class Settings_Page {
 				'taxonomy_taxi',
 				'taxonomy_taxi_settings_section'
 			);
-
-			register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
 	 	}
+
+	 	register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
 	}
 
 	/**
 	*	callback for add_settings_section to render description field
 	*/
 	public static function description(){
-		echo  sprintf( 'version %s', version() );
+		echo sprintf( 'version %s', version() );
 	}
 
 	/**
@@ -45,8 +45,8 @@ class Settings_Page {
 	*	@param string
 	*	@return 
 	*/
-	public static function post_type( $post_type = '' ){
-		$taxonomies = get_object_taxonomies( $post_type, 'objects' ); 
+	public static function post_type( $post_type = '' ){ 
+		$taxonomies = Settings::get_all_for_post_type( $post_type );
 
 		echo render( 'admin/options-general_post-type', array(
 			'post_type' => $post_type,
@@ -55,12 +55,19 @@ class Settings_Page {
 	}
 
 	/**
-	*
+	*	only save unchecked checkboxes
 	*	@param array
 	*	@return array
 	*/
 	public static function save( $form_data ){
+		foreach( $form_data as $post_type => &$options ){
+			$all = get_object_taxonomies( $post_type, 'names' );
+
+			$options = array_diff( $all, $options );
+		}
+
 		//dbug( $form_data );
+
 		return $form_data;
 	}
 

@@ -13,45 +13,30 @@ function admin_menu(){
 }
 add_action( 'admin_menu', __NAMESPACE__.'\admin_menu' );
 
-add_action( 'admin_init', __NAMESPACE__.'\Settings_Page::register' );
+add_action( 'admin_init', __NAMESPACE__.'\Settings_Page::register_page' );
 
 /**
 *	called on `load-edit.php` action
 *	sets up the rest of the actions / filters
 */
 function setup(){
-	require __DIR__.'/sql.php';
-
 	// fix for tag = 0 in drop down borking wp_query
 	if( filter_input(INPUT_GET, 'tag') === "0" )
 		unset( $_GET['tag'] );
 		
 	// set up post type and associated taxonomies
 	$post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : 'post';
-	$tax = get_object_taxonomies( $post_type, 'objects' );
-	
-	taxonomies( $tax );
 
 	add_filter( 'request', __NAMESPACE__.'\Query::request' );
-
-	// filters and actions
-	add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __NAMESPACE__.'\register_sortable_columns', 10, 1 );
-	add_filter( 'manage_pages_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
-	add_filter( 'manage_posts_columns', __NAMESPACE__.'\manage_posts_columns', 10, 1 );
 	
 	add_filter( 'pre_get_posts', __NAMESPACE__.'\Query::pre_get_posts', 10, 1 );
-
-	add_filter( 'posts_fields', __NAMESPACE__.'\posts_fields', 10, 2 );
 	
-	add_filter( 'posts_orderby', __NAMESPACE__.'\posts_orderby', 10, 2 );
-
-	add_filter( 'posts_request', __NAMESPACE__.'\posts_request', 10, 2 );
 	add_filter( 'posts_results', __NAMESPACE__.'\posts_results', 10, 1 );
 
 	add_filter( 'request', __NAMESPACE__.'\request', 10, 1 );	
 	add_action( 'restrict_manage_posts', __NAMESPACE__.'\restrict_manage_posts', 10, 1 );
 
-	Edit::init();
+	Edit::init( $post_type );
 	Sql::init();
 }
 add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
@@ -67,34 +52,6 @@ function inline_save(){
 add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\inline_save', 0 );
 
 /**
-*	attached to `manage_posts_columns` filter
-*	adds columns for custom taxonomies in Edit table
-*	@param array $headings
-*	@return array $headings
-*/
-function manage_posts_columns( $headings ){
-	//  arbitary placement in table if it cant replace categories
-	$keys = array_keys( $headings );
-	$key = array_search( 'categories', $keys );
-	if( !$key )
-		$key = max( 1, count($keys) );
-		
-	// going to replace stock columns with sortable ones
-	unset( $headings['categories'] );
-	unset( $headings['tags'] );
-	
-	$a = array_slice( $headings, 0, $key );
-	$b = array_map( function($taxonomy){
-		return $taxonomy->labels->name;
-	}, taxonomies() );
-	$c = array_slice( $headings, $key );
-	
-	$headings = array_merge( $a, $b, $c );
-	
-	return $headings;
-}
-
-/**
 *	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
 *	@param array WP_Post
 *	@return array
@@ -104,7 +61,7 @@ function posts_results( $posts ){
 	foreach( $posts as $k=>$post ){		
 		$taxonomies = array();
 		
-		foreach( taxonomies() as $tax ){
+		foreach( Edit::get_taxonomies() as $tax ){
 			$tax_name = esc_sql( $tax->name );
 			
 			$col = $tax_name.'_slugs';
@@ -162,27 +119,11 @@ function request( $qvs ){
 }
 
 /**
-*	register custom taxonomies for sortable columns
-*	@param array
-*	@return array
-*/
-function register_sortable_columns( $columns ){
-	$keys = array_keys( taxonomies() );
-	
-	if( count($keys) ){
-		$keys = array_combine( $keys, $keys );
-		$columns = array_merge( $columns, $keys ); 
-	}
-	
-	return $columns;
-}
-
-/**
 *	action for `restrict_manage_posts` 
 *	to display drop down selects for custom taxonomies
 */
 function restrict_manage_posts(){
-	foreach( taxonomies() as $taxonomy => $props ){
+	foreach( Edit::get_taxonomies() as $taxonomy => $props ){
 		$label = array_filter( array(
 			$props->labels->all_items, 
 			$props->name
