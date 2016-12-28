@@ -6,13 +6,21 @@ class Query{
 	protected static $show_none = array();
 
 	/**
+	*
+	*/
+	public static function init(){
+		add_filter( 'request', __CLASS__.'::request' );
+		add_filter( 'pre_get_posts', __CLASS__.'::pre_get_posts', 10, 1 );
+	}
+
+	/**
 	*	handle taxonomies selected [None] - sends query varaible = -1
 	*	parsed in pre_get_posts()
 	*	@param array
 	*	@return array
 	*/
 	public static function request( $qv ){
-		$tax = ( get_taxonomies( array() , 'objects' ) );
+		$tax = ( get_taxonomies( array(), 'objects' ) );
 		
 		foreach( $tax as $v ){
 			if( isset($qv[$v->query_var]) && $qv[$v->query_var] === "-1" ){

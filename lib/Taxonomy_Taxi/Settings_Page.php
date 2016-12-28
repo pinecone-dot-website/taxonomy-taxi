@@ -6,6 +6,14 @@ class Settings_Page {
 	/**
 	*
 	*/
+	public static function init(){
+		self::register_page();
+		add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::view' );
+	}
+
+	/**
+	*
+	*/
 	public static function register_page(){
 		add_settings_section(
 			'taxonomy_taxi_settings_section',

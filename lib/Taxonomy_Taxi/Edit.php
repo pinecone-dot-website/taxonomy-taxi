@@ -67,7 +67,7 @@ class Edit{
 	*/
 	public static function manage_posts_custom_column( $column_name, $post_id ){
 		global $post;
-		
+
 		if( !isset($post->taxonomy_taxi[$column_name]) || !count($post->taxonomy_taxi[$column_name]) )
 			return print '&nbsp;';
 		
@@ -141,12 +141,16 @@ class Edit{
 		}
 	}
 
+	/**
+	*
+	*	@return array
+	*/
 	public static function get_taxonomies(){
 		return self::$taxonomies;
 	}
 
 	/**
-	*
+	*	@param string
 	*/
 	protected static function set_taxonomies( $post_type ){
 		self::$taxonomies = get_object_taxonomies( $post_type, 'objects' );

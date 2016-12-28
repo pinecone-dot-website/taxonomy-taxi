@@ -9,6 +9,8 @@ class Sql{
 		add_filter( 'posts_join', __CLASS__.'::posts_join', 10, 2 );
 		add_filter( 'posts_orderby', __CLASS__.'::posts_orderby', 10, 2 );
 
+		add_filter( 'posts_results', __CLASS__.'::posts_results', 10, 1 );
+
 		add_filter( 'posts_request', __CLASS__.'::posts_request', 10, 2 );
 	}
 
@@ -48,9 +50,7 @@ class Sql{
 	public static function posts_groupby( $sql, &$wp_query ){
 		global $wpdb;
 
-		if( $wp_query->is_main_query() ){
-			$sql = $wpdb->posts.".ID";
-		}
+		$sql = $wpdb->posts.".ID";
 		
 		return $sql;
 	}
@@ -64,15 +64,13 @@ class Sql{
 	public static function posts_join( $sql, &$wp_query ){
 		global $wpdb;
 
-		if( $wp_query->is_main_query() ){
-			$sql .= " LEFT JOIN ".$wpdb->term_relationships." TR_AUTO 
-						ON ".$wpdb->posts.".ID = TR_AUTO.object_id
-					  LEFT JOIN ".$wpdb->term_taxonomy." TX_AUTO 
-					  	ON TR_AUTO.term_taxonomy_id = TX_AUTO.term_taxonomy_id 
-					  LEFT JOIN ".$wpdb->terms." T_AUTO 
-					  	ON TX_AUTO.term_id = T_AUTO.term_id ";
-		}	
-
+		$sql .= " LEFT JOIN ".$wpdb->term_relationships." TR_AUTO 
+					ON ".$wpdb->posts.".ID = TR_AUTO.object_id
+				  LEFT JOIN ".$wpdb->term_taxonomy." TX_AUTO 
+				  	ON TR_AUTO.term_taxonomy_id = TX_AUTO.term_taxonomy_id 
+				  LEFT JOIN ".$wpdb->terms." T_AUTO 
+				  	ON TX_AUTO.term_id = T_AUTO.term_id ";
+		
 		return $sql;
 	}
 
@@ -91,6 +89,60 @@ class Sql{
 		return $sql;
 	}
 
+	/**
+	*	filter for `posts_results` to parse taxonomy data from each $post into array for later display 
+	*	@param array of WP_Post
+	*	@return array
+	*/
+	public static function posts_results( $posts ){
+		// assigning to &$post was not working on wpengine...
+		foreach( $posts as $k => $post ){		
+			$taxonomies = array();
+			
+			foreach( Edit::get_taxonomies() as $tax ){
+
+				$tax_name = esc_sql( $tax->name );
+				
+				$col = $tax_name.'_slugs';
+				$slugs = explode( ',', $post->$col );
+				
+				
+
+				$col = $tax_name.'_names';
+				$names = explode( ',', $post->$col );
+				
+			
+
+				$objects = array_fill( 0, count($names), 0 );
+				array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
+					switch( $tax_name ){
+						case 'category':
+							$tax_name = 'category_name';
+							break;
+							
+						case 'post_tag':
+							$tax_name = 'tag';
+							break;
+					}
+							
+					$v = array(
+						'name' => $names[$k],
+						'post_type' => $post->post_type,
+						'slug' => $slugs[$k], 
+						'taxonomy' => $tax_name
+					);
+				});
+			
+				$taxonomies[$tax_name] = $objects;
+			}
+
+			$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
+			
+			$posts[$k] = new \WP_Post( (object) $props );
+		}
+		
+		return $posts;
+	}
 
 	/**
 	*	just for debugging, view the sql query that populates the Edit table
@@ -99,6 +151,7 @@ class Sql{
 	*	@return string
 	*/
 	public static function posts_request( $sql, &$wp_query ){
+		//ddbug( $sql );
 		return $sql;
 	}
 }
