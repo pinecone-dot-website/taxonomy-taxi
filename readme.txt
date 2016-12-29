@@ -1,14 +1,14 @@
 === Taxonomy Taxi ===
 Contributors: postpostmodern, pinecone-dot-io
 Donate link: https://cash.me/$EricEaglstun
-Tags: custom taxonomies, taxonomy
+Tags: custom taxonomies, taxonomy, term
 Requires at least: 3.9
 Tested up to: 4.7
 Stable tag: trunk
 
 == Description ==
 Automatically display custom taxonomy information in wp-admin/edit.php
-Not tested with versions pre- 3.2 - requires PHP 5.3
+- requires PHP 5.3
 
 == Installation ==
 1. Place /taxonomi-taxi/ directory in /wp-content/plugins/

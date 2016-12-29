@@ -44,11 +44,15 @@ class Edit{
 		// first try to put custom columns starting at categories placement
 		$key = array_search( 'categories', $keys );
 
+		// if that doesnt work put before post comments
+		if( !$key )
+			$key = array_search( 'comments', $keys );
+
 		// if that doesnt work put before date
 		if( !$key )
-			$key = array_search( 'date', $keys );
+			$key = array_search( 'date', $keys ) ? array_search( 'date', $keys ) - 1 : FALSE;
 
-		//  arbitary placement in table if it cant find date or category
+		//  arbitary placement in table if it cant find category, comments, or date
 		if( !$key )
 			$key = max( 1, count($keys) );
 			
@@ -64,7 +68,7 @@ class Edit{
 		$c = array_slice( $headings, $key );
 		
 		$headings = array_merge( $a, $b, $c );
-	
+		
 		return $headings;
 	}
 
