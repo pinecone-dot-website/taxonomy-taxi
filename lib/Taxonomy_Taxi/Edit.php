@@ -147,7 +147,7 @@ class Edit{
 				'show_option_all' => 'View '.$props->view_all,
 				'show_option_none' => '[None]',
 				'taxonomy' => $taxonomy,
-				'walker' => new Walker_Taxo_Taxi
+				'walker' => new Walker
 			) );
 			
 			echo $html;

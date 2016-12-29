@@ -12,10 +12,6 @@ add_action( 'admin_menu', __NAMESPACE__.'\Settings_Page::init' );
 *	sets up the rest of the actions / filters
 */
 function setup(){
-	// fix for tag = 0 in drop down borking wp_query
-	if( filter_input(INPUT_GET, 'tag') === "0" )
-		unset( $_GET['tag'] );
-	
 	// set up post type and associated taxonomies
 	switch( $GLOBALS['pagenow'] ){
 		case 'upload.php':

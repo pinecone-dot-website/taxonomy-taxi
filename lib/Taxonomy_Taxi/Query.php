@@ -23,10 +23,18 @@ class Query{
 		$tax = get_taxonomies( array(), 'objects' );
 		
 		foreach( $tax as $v ){
-			if( isset($qv[$v->query_var]) && $qv[$v->query_var] === "-1" ){
-				self::$show_none[] = $v->name;
-				unset( $qv[$v->query_var] );
-			}
+			if( isset($qv[$v->query_var]) ){
+				switch( $qv[$v->query_var] ){
+					case '-1':
+						// posts with no terms in taxonomy - [None]
+						self::$show_none[] = $v->name;
+					case '0':
+						// fix bug in tag = 0 in drop down borking wp_query
+						unset( $qv[$v->query_var] );
+
+						break;
+				}
+			} 
 		}
 	
 		return $qv;
