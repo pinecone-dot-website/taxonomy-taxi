@@ -24,7 +24,7 @@ class Settings_Page {
 				'taxonomy_taxi_setting_name-'.$post_type->name,
 				$post_type->labels->name,
 				function() use($post_type){
-					self::post_type( $post_type->name );
+					self::render_post_type( $post_type->name );
 				},
 				'taxonomy_taxi',
 				'taxonomy_taxi_settings_section'
@@ -33,7 +33,7 @@ class Settings_Page {
 
 		register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
 
-		add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::view' );
+		add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::render_settings_page' );
 	}
 
 	/**
@@ -64,8 +64,8 @@ class Settings_Page {
 	*	@return array
 	*/
 	public static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ){
-		if( $plugin_file == 'taxonomy-taxi/_plugin.php' ){
-			$actions[] = '<a href="options-general.php?page=taxonomy_taxi">Settings</a>';
+		if( $plugin_file == 'taxonomy-taxi/_plugin.php' && $url = menu_page_url('taxonomy_taxi', FALSE) ){
+			$actions[] = sprintf( '<a href="%s">Settings</a>', $url );
 		}
 
 		return $actions;
@@ -76,13 +76,24 @@ class Settings_Page {
 	*	@param string
 	*	@return 
 	*/
-	public static function post_type( $post_type = '' ){ 
+	public static function render_post_type( $post_type = '' ){ 
 		$taxonomies = Settings::get_all_for_post_type( $post_type );
 
 		echo render( 'admin/options-general_post-type', array(
 			'post_type' => $post_type,
 			'taxonomies' => $taxonomies
 		) );
+	}
+
+	/**
+	*	callback for add_settings_field to render form ui
+	*/
+	public static function render_settings_page(){
+		wp_enqueue_style( 'taxonomy-taxi', plugins_url('public/admin/options-general.css', TAXONOMY_TAXI_FILE), array(), version(), 'all' );
+
+		echo render( 'admin/options-general', array() );
+
+		add_filter( 'admin_footer_text', __CLASS__.'::admin_footer_text' );
 	}
 
 	/**
@@ -98,16 +109,5 @@ class Settings_Page {
 		}
 
 		return $form_data;
-	}
-
-	/**
-	*	callback for add_settings_field to render form ui
-	*/
-	public static function view(){
-		wp_enqueue_style( 'taxonomy-taxi', plugins_url('public/admin/options-general.css', TAXONOMY_TAXI_FILE), array(), version(), 'all' );
-
-		echo render( 'admin/options-general', array() );
-
-		add_filter( 'admin_footer_text', __CLASS__.'::admin_footer_text' );
 	}
 }
