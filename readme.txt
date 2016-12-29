@@ -16,6 +16,9 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .9.9.2 =
+* Support media library list
+
 = .9.9 =
 * Initial settings page to show / hide columns
 

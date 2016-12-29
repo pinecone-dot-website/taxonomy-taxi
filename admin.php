@@ -19,15 +19,24 @@ function setup(){
 	// fix for tag = 0 in drop down borking wp_query
 	if( filter_input(INPUT_GET, 'tag') === "0" )
 		unset( $_GET['tag'] );
-		
+	
 	// set up post type and associated taxonomies
-	$post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : 'post';
+	switch( $GLOBALS['pagenow'] ){
+		case 'upload.php':
+			$post_type = 'attachment';
+			break;
+
+		default:
+			$post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : 'post';
+			break;
+	}
 
 	Edit::init( $post_type );
 	Query::init();
 	Sql::init();
 }
 add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
+add_action( 'load-upload.php', __NAMESPACE__.'\setup' );
 
 /**
 *	attached to ajax for quick edit

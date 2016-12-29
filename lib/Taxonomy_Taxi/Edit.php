@@ -18,10 +18,13 @@ class Edit{
 		add_filter( 'disable_categories_dropdown', '__return_true' );
 		add_action( 'restrict_manage_posts', __CLASS__.'::restrict_manage_posts', 10, 1 );
 
-		// edit.php columns
-		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );	
+		// edit.php and upload.php columns
+		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
+		add_filter( 'manage_upload_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
+		add_filter( 'manage_media_columns', __CLASS__.'::manage_posts_columns', 10, 1 );		
 		add_filter( 'manage_pages_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
 		add_filter( 'manage_posts_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
+		add_action( 'manage_media_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
 		add_action( 'manage_pages_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
 		add_action( 'manage_posts_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
 
@@ -35,12 +38,20 @@ class Edit{
 	*	@return array $headings
 	*/
 	public static function manage_posts_columns( $headings ){
-		//  arbitary placement in table if it cant replace categories
 		$keys = array_keys( $headings );
+
+		// first try to put custom columns starting at categories placement
 		$key = array_search( 'categories', $keys );
 
-		if( !$key )
+		// if that doesnt work put before date
+		if( !$key ){
+			$key = array_search( 'date', $keys );
+		}
+
+		//  arbitary placement in table if it cant find date or category
+		if( !$key ){
 			$key = max( 1, count($keys) );
+		}
 			
 		// going to replace stock columns with sortable ones
 		unset( $headings['categories'] );
