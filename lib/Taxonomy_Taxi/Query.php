@@ -14,7 +14,7 @@ class Query{
 	}
 
 	/**
-	*	handle taxonomies selected [None] - sends query variable = -1
+	*	handle taxonomies selected View All or Show None
 	*	parsed in pre_get_posts()
 	*	@param array
 	*	@return array
@@ -26,7 +26,7 @@ class Query{
 			if( isset($qv[$v->query_var]) ){
 				switch( $qv[$v->query_var] ){
 					case '-1':
-						// posts with no terms in taxonomy - [None]
+						// posts with no terms in taxonomy - [ No {$term->name} ]
 						self::$show_none[] = $v->name;
 					case '0':
 						// fix bug in tag = 0 in drop down borking wp_query

@@ -2,7 +2,7 @@
 
 namespace Taxonomy_Taxi;
 
-// should only be used on wp-admin/edit.php
+// should only be used on wp-admin/edit.php and wp-admin/upload.php
 class Edit{
 	protected static $post_type = '';
 	protected static $taxonomies = array();
@@ -136,16 +136,17 @@ class Edit{
 	*	@return
 	*/
 	public static function restrict_manage_posts( $post_type = '', $which = 'top' ){
-		foreach( Settings::get_active_for_post_type(self::$post_type) as $taxonomy => $props ){		
+		foreach( Settings::get_active_for_post_type(self::$post_type) as $taxonomy => $props ){
 			$html = wp_dropdown_categories( array(
 				'echo' => 0,
 				'hide_empty' => TRUE,
-				'hide_if_empty' => TRUE,
+				'hide_if_empty' => FALSE,
 				'hierarchical' => TRUE,
 				'name' => $props->query_var,
 				'selected' => isset( $_GET[$props->query_var] ) ? $_GET[$props->query_var] : FALSE,
+				//'show_count' => TRUE,
 				'show_option_all' => 'View '.$props->view_all,
-				'show_option_none' => '[None]',
+				'show_option_none' => sprintf( '[ No %s ]', $props->label ),
 				'taxonomy' => $taxonomy,
 				'walker' => new Walker
 			) );
