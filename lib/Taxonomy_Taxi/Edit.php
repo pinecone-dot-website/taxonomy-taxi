@@ -165,6 +165,9 @@ class Edit{
 	*	@return array
 	*/
 	public static function get_taxonomies( $post_type ){
+		if( !isset(self::$taxonomies[$post_type]) )
+			self::set_taxonomies( $post_type );
+
 		return self::$taxonomies[$post_type];
 	}
 
