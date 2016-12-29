@@ -18,9 +18,10 @@ class Edit{
 		add_filter( 'disable_categories_dropdown', '__return_true' );
 		add_action( 'restrict_manage_posts', __CLASS__.'::restrict_manage_posts', 10, 2 );
 
-		// edit.php and upload.php columns
-		$screen_id = get_current_screen()->id;
-		add_filter( 'manage_'.$screen_id.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
+		// edit.php and upload.php columns, not set on quick edit ajax
+		$screen = get_current_screen();
+		if( $screen )
+			add_filter( 'manage_'.$screen->id.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
 		
 		add_filter( 'manage_media_columns', __CLASS__.'::manage_posts_columns', 10, 1 );		
 		add_filter( 'manage_'.$post_type.'_posts_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
@@ -32,7 +33,7 @@ class Edit{
 	}
 
 	/**
-	*	attached to `manage_posts_columns` filter
+	*	attached to `manage_{$post_type}_posts_columns` and `manage_media_columns` filters
 	*	adds columns for custom taxonomies in Edit table
 	*	@param array $headings
 	*	@return array $headings
@@ -44,14 +45,12 @@ class Edit{
 		$key = array_search( 'categories', $keys );
 
 		// if that doesnt work put before date
-		if( !$key ){
+		if( !$key )
 			$key = array_search( 'date', $keys );
-		}
 
 		//  arbitary placement in table if it cant find date or category
-		if( !$key ){
+		if( !$key )
 			$key = max( 1, count($keys) );
-		}
 			
 		// going to replace stock columns with sortable ones
 		unset( $headings['categories'] );
@@ -70,7 +69,7 @@ class Edit{
 	}
 
 	/**
-	*	attached to `manage_posts_custom_column` action
+	*	attached to `manage_{$post_type}_posts_custom_column` and `manage_media_custom_column` actions
 	*	echos column data inside each table cell
 	*	@param string 
 	*	@param int
