@@ -20,7 +20,7 @@ class Query{
 	*	@return array
 	*/
 	public static function request( $qv ){
-		$tax = ( get_taxonomies( array(), 'objects' ) );
+		$tax = get_taxonomies( array(), 'objects' );
 		
 		foreach( $tax as $v ){
 			if( isset($qv[$v->query_var]) && $qv[$v->query_var] === "-1" ){

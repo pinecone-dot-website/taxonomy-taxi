@@ -100,19 +100,14 @@ class Sql{
 			$taxonomies = array();
 			
 			foreach( Edit::get_taxonomies() as $tax ){
-
 				$tax_name = esc_sql( $tax->name );
 				
 				$col = $tax_name.'_slugs';
 				$slugs = explode( ',', $post->$col );
 				
-				
-
 				$col = $tax_name.'_names';
 				$names = explode( ',', $post->$col );
 				
-			
-
 				$objects = array_fill( 0, count($names), 0 );
 				array_walk( $objects, function( &$v, $k ) use( $names, $slugs, $post, $tax_name ){
 					switch( $tax_name ){
@@ -137,8 +132,9 @@ class Sql{
 			}
 
 			$props = array_merge( $post->to_array(), array('taxonomy_taxi' => $taxonomies) );
-			
 			$posts[$k] = new \WP_Post( (object) $props );
+
+			wp_cache_set( $post->ID, $posts[$k], 'posts' );
 		}
 		
 		return $posts;
@@ -151,7 +147,6 @@ class Sql{
 	*	@return string
 	*/
 	public static function posts_request( $sql, &$wp_query ){
-		//ddbug( $sql );
 		return $sql;
 	}
 }
