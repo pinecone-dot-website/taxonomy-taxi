@@ -55,6 +55,23 @@ class Settings_Page {
 	}
 
 	/**
+	*	show direct link to settings page in plugins list
+	*	attached to `plugin_action_links` filter
+	*	@param array
+	*	@param string
+	*	@param array
+	*	@param string
+	*	@return array
+	*/
+	public static function plugin_action_links( $actions, $plugin_file, $plugin_data, $context ){
+		if( $plugin_file == 'taxonomy-taxi/_plugin.php' ){
+			$actions[] = '<a href="options-general.php?page=taxonomy_taxi">Settings</a>';
+		}
+
+		return $actions;
+	}
+
+	/**
 	*	render the ui for each post type row
 	*	@param string
 	*	@return 

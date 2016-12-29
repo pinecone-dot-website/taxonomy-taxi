@@ -31,6 +31,11 @@ add_action( 'load-edit.php', __NAMESPACE__.'\setup' );
 add_action( 'load-upload.php', __NAMESPACE__.'\setup' );
 
 /**
+*	show direct link to settings page in plugins list
+*/
+add_filter( 'plugin_action_links', __NAMESPACE__.'\Settings_Page::plugin_action_links', 10, 4 );
+
+/**
 *	attached to ajax for quick edit
 *	subvert wp_ajax_inline_save()
 */
