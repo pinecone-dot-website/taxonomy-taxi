@@ -4,17 +4,10 @@ namespace Taxonomy_Taxi;
 
 class Settings_Page {
 	/**
-	*
+	*	
+	*	attached to `admin_menu` action
 	*/
 	public static function init(){
-		self::register_page();
-		add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::view' );
-	}
-
-	/**
-	*
-	*/
-	public static function register_page(){
 		add_settings_section(
 			'taxonomy_taxi_settings_section',
 			'Taxonomy Taxi',
@@ -38,7 +31,9 @@ class Settings_Page {
 			);
 	 	}
 
-	 	register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
+		register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
+
+		add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::view' );
 	}
 
 	/**

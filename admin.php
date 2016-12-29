@@ -4,12 +4,8 @@ namespace Taxonomy_Taxi;
 
 /**
 *	setup settings link and callbacks
-*	attached to `admin_menu` action
 */
-function admin_menu(){
-	Settings_Page::init();
-}
-add_action( 'admin_menu', __NAMESPACE__.'\admin_menu' );
+add_action( 'admin_menu', __NAMESPACE__.'\Settings_Page::init' );
 
 /**
 *	called on `load-edit.php` action and from wp_ajax_inline-save

@@ -9,12 +9,12 @@ class Query{
 	*
 	*/
 	public static function init(){
-		add_filter( 'request', __CLASS__.'::request' );
+		add_filter( 'request', __CLASS__.'::request', 10, 1 );
 		add_filter( 'pre_get_posts', __CLASS__.'::pre_get_posts', 10, 1 );
 	}
 
 	/**
-	*	handle taxonomies selected [None] - sends query varaible = -1
+	*	handle taxonomies selected [None] - sends query variable = -1
 	*	parsed in pre_get_posts()
 	*	@param array
 	*	@return array
