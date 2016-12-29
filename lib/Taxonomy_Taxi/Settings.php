@@ -3,10 +3,11 @@
 namespace Taxonomy_Taxi;
 
 class Settings{
-	protected static $settings = array();
+	// @todo implement caching
+	protected static $settings = array();	
 
 	/**
-	*
+	*	gets the taxonomies for post type which are marked active from settings page
 	*	@param string
 	*	@return array
 	*/
@@ -19,7 +20,7 @@ class Settings{
 	}
 
 	/**
-	*
+	*	gets all taxonomies for post type, and marks whether it is active from settings page
 	*	@param string
 	*	@return array
 	*/
@@ -49,11 +50,11 @@ class Settings{
 	}
 
 	/**
-	*
+	*	gets the saved setting for post type - taxonomies not to display
 	*	@param string
 	*	@return array
 	*/
-	public static function get_saved( $post_type = '' ){
+	protected static function get_saved( $post_type = '' ){
 		$option = get_option( 'taxonomy_taxi' );
 
 		return isset( $option[$post_type] ) ? $option[$post_type] : array();
