@@ -35,7 +35,7 @@ class Sql{
 					   			IF(TX_AUTO.taxonomy = '{$tax}', T_AUTO.slug, NULL)
 					   		) 
 					   		ORDER BY T_AUTO.name ASC 
-					   ) AS `{$tax}_slugs`";
+					   ) AS `{$tax}_slugs` /* Taxonomy_Taxi posts_fields {$tax} */";
 		}
 		 
 		return $sql;
@@ -50,7 +50,7 @@ class Sql{
 	public static function posts_groupby( $sql, &$wp_query ){
 		global $wpdb;
 
-		$sql = $wpdb->posts.".ID";
+		$sql = $wpdb->posts.".ID /* Taxonomy_Taxi posts_groupby */";
 		
 		return $sql;
 	}
@@ -69,7 +69,7 @@ class Sql{
 				  LEFT JOIN ".$wpdb->term_taxonomy." TX_AUTO 
 				  	ON TR_AUTO.term_taxonomy_id = TX_AUTO.term_taxonomy_id 
 				  LEFT JOIN ".$wpdb->terms." T_AUTO 
-				  	ON TX_AUTO.term_id = T_AUTO.term_id ";
+				  	ON TX_AUTO.term_id = T_AUTO.term_id /* Taxonomy_Taxi posts_join */";
 		
 		return $sql;
 	}
@@ -84,7 +84,7 @@ class Sql{
 		global $wpdb;
 		
 		if( isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies()) )
-			$sql = $wp_query->query_vars['orderby']."_slugs ".$wp_query->query_vars['order'];
+			$sql = $wp_query->query_vars['orderby']."_slugs ".$wp_query->query_vars['order']." /* Taxonomy_Taxi posts_orderby */";
 		
 		return $sql;
 	}
