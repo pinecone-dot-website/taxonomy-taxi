@@ -42,8 +42,4 @@ add_action( 'load-upload.php', __NAMESPACE__.'\setup' );
 *	attached to ajax for quick edit
 *	subvert wp_ajax_inline_save()
 */
-function inline_save(){
-	require __DIR__.'/admin-ajax.php';
-	wp_ajax_inline_save();
-}
-add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\inline_save', 0 );
+add_action( 'wp_ajax_inline-save', __NAMESPACE__.'\WP_Ajax::inline_save', 0 );

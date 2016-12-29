@@ -2,7 +2,7 @@
 Contributors: postpostmodern, pinecone-dot-io
 Donate link: https://cash.me/$EricEaglstun
 Tags: custom taxonomies, taxonomy
-Requires at least: 3.2
+Requires at least: 3.9
 Tested up to: 4.7
 Stable tag: trunk
 
