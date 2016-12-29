@@ -2,6 +2,8 @@
 
 namespace Taxonomy_Taxi;
 
+define( 'TAXONOMY_TAXI_FILE', __FILE__ );
+
 if( is_admin() )
 	require __DIR__.'/admin.php';
 
