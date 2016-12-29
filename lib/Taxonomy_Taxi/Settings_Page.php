@@ -37,6 +37,17 @@ class Settings_Page {
 	}
 
 	/**
+	*
+	*	@param string html
+	*	@return string html
+	*/
+	public static function admin_footer_text( $original = '' ){
+		return render( 'admin/options-general_footer', array(
+			'version' => version()
+		) );
+	}
+
+	/**
 	*	callback for add_settings_section to render description field
 	*/
 	public static function description(){
