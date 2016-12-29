@@ -16,17 +16,17 @@ class Edit{
 		self::set_taxonomies( $post_type );
 
 		add_filter( 'disable_categories_dropdown', '__return_true' );
-		add_action( 'restrict_manage_posts', __CLASS__.'::restrict_manage_posts', 10, 1 );
+		add_action( 'restrict_manage_posts', __CLASS__.'::restrict_manage_posts', 10, 2 );
 
 		// edit.php and upload.php columns
-		add_filter( 'manage_edit-'.$post_type.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
-		add_filter( 'manage_upload_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
+		$screen_id = get_current_screen()->id;
+		add_filter( 'manage_'.$screen_id.'_sortable_columns', __CLASS__.'::register_sortable_columns', 10, 1 );
+		
 		add_filter( 'manage_media_columns', __CLASS__.'::manage_posts_columns', 10, 1 );		
-		add_filter( 'manage_pages_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
-		add_filter( 'manage_posts_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
+		add_filter( 'manage_'.$post_type.'_posts_columns', __CLASS__.'::manage_posts_columns', 10, 1 );
+
 		add_action( 'manage_media_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
-		add_action( 'manage_pages_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
-		add_action( 'manage_posts_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
+		add_action( 'manage_'.$post_type.'_posts_custom_column', __CLASS__.'::manage_posts_custom_column', 10, 2 );
 
 		add_filter( 'request', __CLASS__.'::request', 10, 1 );	
 	}
@@ -132,8 +132,11 @@ class Edit{
 	/**
 	*	action for `restrict_manage_posts` 
 	*	to display drop down selects for custom taxonomies
+	*	@param string not set for upload.php / attachment!
+	*	@param string
+	*	@return
 	*/
-	public static function restrict_manage_posts(){
+	public static function restrict_manage_posts( $post_type = '', $which = 'top' ){
 		foreach( Settings::get_active_for_post_type(self::$post_type) as $taxonomy => $props ){		
 			$html = wp_dropdown_categories( array(
 				'echo' => 0,
