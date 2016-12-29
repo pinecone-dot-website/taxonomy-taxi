@@ -161,16 +161,17 @@ class Edit{
 
 	/**
 	*
+	*	@param string
 	*	@return array
 	*/
-	public static function get_taxonomies(){
-		return self::$taxonomies;
+	public static function get_taxonomies( $post_type ){
+		return self::$taxonomies[$post_type];
 	}
 
 	/**
 	*	@param string
 	*/
 	protected static function set_taxonomies( $post_type ){
-		self::$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+		self::$taxonomies[$post_type] = get_object_taxonomies( $post_type, 'objects' );
 	}
 }

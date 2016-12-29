@@ -21,7 +21,7 @@ class Sql{
 	*	@return string
 	*/
 	public static function posts_fields( $sql, &$wp_query ){
-		foreach( Edit::get_taxonomies() as $tax ){
+		foreach( Edit::get_taxonomies($wp_query->query_vars['post_type']) as $tax ){
 			$tax = esc_sql( $tax->name );
 			
 			$sql .= ", GROUP_CONCAT( 
@@ -82,8 +82,8 @@ class Sql{
 	*/
 	public static function posts_orderby( $sql, &$wp_query ){
 		global $wpdb;
-		
-		if( isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies()) )
+
+		if( isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies($wp_query->query_vars['post_type'])) )
 			$sql = $wp_query->query_vars['orderby']."_slugs ".$wp_query->query_vars['order']." /* Taxonomy_Taxi posts_orderby */";
 		
 		return $sql;
@@ -99,7 +99,7 @@ class Sql{
 		foreach( $posts as $k => $post ){		
 			$taxonomies = array();
 			
-			foreach( Edit::get_taxonomies() as $tax ){
+			foreach( Edit::get_taxonomies($post->post_type) as $tax ){
 				$tax_name = esc_sql( $tax->name );
 				
 				$col = $tax_name.'_slugs';

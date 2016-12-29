@@ -3,7 +3,7 @@
 namespace Taxonomy_Taxi;
 
 class Settings{
-	// @todo implement caching
+	// save user settings to prevent multiple calls to get_option
 	protected static $settings = array();	
 
 	/**
@@ -25,28 +25,32 @@ class Settings{
 	*	@return array
 	*/
 	public static function get_all_for_post_type( $post_type = '' ){
-		$taxonomies = get_object_taxonomies( $post_type, 'objects' );
-		$saved = self::get_saved( $post_type );
+		if( !isset(self::$settings[$post_type]) ){
+			$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+			$saved = self::get_saved( $post_type );
 
-		$checked = array_keys(array_diff_key($taxonomies, array_flip($saved)) );
+			$checked = array_keys(array_diff_key($taxonomies, array_flip($saved)) );
 
-		$settings = array();
-		foreach( $taxonomies as $tax => $props ){
-			$view_all = array_filter( array(
-				$props->labels->all_items, 
-				$props->name
-			) );
-		
-			$settings[$tax] = (object) array(
-				'checked' => in_array( $tax, $checked ),
-				'label' => $props->label,
-				'query_var' => $props->query_var,
-				'name' => $tax,
-				'view_all' => reset( $view_all )
-			);
+			$settings = array();
+			foreach( $taxonomies as $tax => $props ){
+				$view_all = array_filter( array(
+					$props->labels->all_items, 
+					$props->name
+				) );
+			
+				$settings[$tax] = (object) array(
+					'checked' => in_array( $tax, $checked ),
+					'label' => $props->label,
+					'query_var' => $props->query_var,
+					'name' => $tax,
+					'view_all' => reset( $view_all )
+				);
+			}
+
+			self::$settings[$post_type] = $settings;
 		}
-
-		return $settings;
+		
+		return self::$settings[$post_type];
 	}
 
 	/**
