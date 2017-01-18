@@ -117,6 +117,16 @@ class Settings_Page {
 			$saved[$post_type] = array_diff( $all, $user_input );
 		}
 
+		// fix saving the options when there is no option saved in the db yet
+		// i have no idea why this works
+		// @TODO make this not suck
+		add_filter( "pre_update_option_taxonomy_taxi", function( $value, $old_value, $option ) use( $form_data ){
+			if( $old_value === FALSE )
+				$value = $form_data;
+
+			return $value;
+		}, 10, 3 );
+
 		return $saved;
 	}
 }
