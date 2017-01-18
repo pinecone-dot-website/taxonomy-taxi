@@ -102,12 +102,19 @@ class Settings_Page {
 	*	@return array
 	*/
 	public static function save( $form_data ){
-		foreach( $form_data as $post_type => &$options ){
-			$all = get_object_taxonomies( $post_type, 'names' );
+		$post_types = get_post_types( array(
+	 		'show_ui' => TRUE
+	 	), 'objects' );
+		
+		$saved = array();
 
-			$options = array_diff( $all, $options );
+		foreach( $post_types as $post_type => $object ){
+			$all = get_object_taxonomies( $post_type, 'names' );
+			$user_input = isset($form_data[$post_type]) ? $form_data[$post_type] : array();
+
+			$saved[$post_type] = array_diff( $all, $user_input );
 		}
 
-		return $form_data;
+		return $saved;
 	}
 }
