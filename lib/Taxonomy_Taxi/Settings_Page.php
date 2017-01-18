@@ -91,6 +91,8 @@ class Settings_Page {
 	public static function render_settings_page(){
 		wp_enqueue_style( 'taxonomy-taxi', plugins_url('public/admin/options-general.css', TAXONOMY_TAXI_FILE), array(), version(), 'all' );
 
+		wp_enqueue_script( 'taxonomy-taxi', plugins_url('public/admin/options-general.js', TAXONOMY_TAXI_FILE), array(), version(), 'all' );
+
 		echo render( 'admin/options-general', array() );
 
 		add_filter( 'admin_footer_text', __CLASS__.'::admin_footer_text' );
