@@ -16,6 +16,9 @@ Automatically display custom taxonomy information in wp-admin/edit.php
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
+= .9.9.6 =
+* Fix saving options with all taxonomies deselected
+
 = .9.9.2 =
 * Support media library list
 
