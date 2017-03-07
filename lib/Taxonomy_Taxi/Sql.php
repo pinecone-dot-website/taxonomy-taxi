@@ -20,7 +20,7 @@ class Sql{
 	*	@param WP_Query
 	*	@return string
 	*/
-	public static function posts_fields( $sql, &$wp_query ){
+	public static function posts_fields( $sql, $wp_query ){
 		foreach( Edit::get_taxonomies($wp_query->query_vars['post_type']) as $tax ){
 			$tax = esc_sql( $tax->name );
 			
@@ -47,7 +47,7 @@ class Sql{
 	*	@param WP_Query
 	*	@return string
 	*/
-	public static function posts_groupby( $sql, &$wp_query ){
+	public static function posts_groupby( $sql, $wp_query ){
 		global $wpdb;
 
 		$sql = $wpdb->posts.".ID /* Taxonomy_Taxi posts_groupby */";
@@ -61,7 +61,7 @@ class Sql{
 	*	@param WP_Query
 	*	@return string
 	*/
-	public static function posts_join( $sql, &$wp_query ){
+	public static function posts_join( $sql, $wp_query ){
 		global $wpdb;
 
 		$sql .= " LEFT JOIN ".$wpdb->term_relationships." TR_AUTO 
@@ -80,7 +80,7 @@ class Sql{
 	*	@param WP_Query
 	*	@return string
 	*/
-	public static function posts_orderby( $sql, &$wp_query ){
+	public static function posts_orderby( $sql, $wp_query ){
 		global $wpdb;
 
 		if( isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies($wp_query->query_vars['post_type'])) )
@@ -146,7 +146,7 @@ class Sql{
 	*	@param string 
 	*	@return string
 	*/
-	public static function posts_request( $sql, &$wp_query ){
+	public static function posts_request( $sql, $wp_query ){
 		return $sql;
 	}
 }
