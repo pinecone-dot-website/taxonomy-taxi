@@ -3,13 +3,18 @@
     "type": "wordpress-plugin",
     "license": "GPL-2.0+",
     "authors": [
-      {
-        "name": "Eric Eaglstun",
-        "email": "postpostmodern@gmail.com"
-      }
+        {
+            "name": "Eric Eaglstun",
+            "email": "postpostmodern@gmail.com"
+        }
     ],
     "autoload": {
-        "psr-4": {"Taxonomy_Taxi\\": "lib/Taxonomy_Taxi/"}
+        "files": [
+            "functions.php"
+        ],
+        "psr-4": {
+            "Taxonomy_Taxi\\": "lib/Taxonomy_Taxi/"
+        }
     },
     "require": {
         "composer/installers": "~1.0"
