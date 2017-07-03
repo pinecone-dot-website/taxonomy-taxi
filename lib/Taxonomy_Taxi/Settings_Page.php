@@ -12,7 +12,7 @@ class Settings_Page
     {
         add_settings_section(
             'taxonomy_taxi_settings_section',
-            'Taxonomy Taxi',
+            '', // subhead
             __CLASS__.'::description',
             'taxonomy_taxi'
         );
@@ -35,7 +35,13 @@ class Settings_Page
 
         register_setting( 'taxonomy_taxi', 'taxonomy_taxi', __CLASS__.'::save' );
 
-        add_options_page( 'Taxonomy Taxi', 'Taxonomy Taxi', 'manage_options', 'taxonomy_taxi', __CLASS__.'::render_settings_page' );
+        add_options_page( 
+            'Taxonomy Taxi', 
+            'Taxonomy Taxi', 
+            'manage_options', 
+            'taxonomy_taxi', 
+            __CLASS__.'::render_settings_page' 
+        );
     }
 
     /**
@@ -55,7 +61,7 @@ class Settings_Page
     */
     public static function description()
     {
-        echo sprintf( 'version %s', version() );
+        echo sprintf( '<pre>%s</pre>', version() );
     }
 
     /**
