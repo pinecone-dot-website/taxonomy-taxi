@@ -4,25 +4,10 @@ namespace Taxonomy_Taxi;
 
 define( 'TAXONOMY_TAXI_FILE', __FILE__ );
 
-require_once __DIR__.'/functions.php';
+if (file_exists(__DIR__.'/vendor/autoload.php')) {
+    require __DIR__.'/vendor/autoload.php';
+}
 
 if (is_admin()) {
     require __DIR__.'/admin.php';
 }
-
-/**
-*   PSR-4
-*   @param string
-*/
-function autoload($class)
-{
-    if (strpos($class, __NAMESPACE__) !== 0) {
-        return;
-    }
-
-    $file = __DIR__ .'/lib/'. str_replace('\\', '/', $class) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
-}
-spl_autoload_register( __NAMESPACE__.'\autoload' );

@@ -15,8 +15,5 @@
         "psr-4": {
             "Taxonomy_Taxi\\": "lib/Taxonomy_Taxi/"
         }
-    },
-    "require": {
-        "composer/installers": "~1.0"
     }
 }
