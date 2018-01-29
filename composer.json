@@ -15,5 +15,8 @@
         "psr-4": {
             "Taxonomy_Taxi\\": "lib/Taxonomy_Taxi/"
         }
+    },
+    "require": {
+        "php": ">=5.4"
     }
 }
