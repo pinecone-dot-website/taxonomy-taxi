@@ -1,14 +1,14 @@
 === Taxonomy Taxi ===
 Contributors: postpostmodern, pinecone-dot-io
-Donate link: http://www.heifer.org/
-Tags: custom taxonomies, taxonomy
-Requires at least: 3.2
-Tested up to: 4.0.beta2
+Donate link: https://cash.me/$EricEaglstun
+Tags: custom taxonomies, taxonomy, term
+Requires at least: 3.9
+Tested up to: 4.8
 Stable tag: trunk
 
 == Description ==
 Automatically display custom taxonomy information in wp-admin/edit.php
-Not tested with versions pre- 3.2 - requires PHP 5.3
+- requires PHP 5.3
 
 == Installation ==
 1. Place /taxonomi-taxi/ directory in /wp-content/plugins/
@@ -16,46 +16,61 @@ Not tested with versions pre- 3.2 - requires PHP 5.3
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
 
 == Changelog ==
-= .98 =
-* Initial support showing posts that have no terms in taxonomy, works best with custom taxonomy
+= 1.0.0 =
+* Seems to be working pretty dang well
 
-= .97 =
-* forgot what this release was
+= 0.9.9.6 =
+* Fix saving options with all taxonomies deselected
 
-= .96 =
+= 0.9.9.2 =
+* Support media library list
+
+= 0.9.9 =
+* Initial settings page to show / hide columns
+
+= 0.9.8 =
+* Initial support to filter on having no taxonomies
+
+= 0.9.7.1 =
+* Standardizing junk, add composer
+
+= 0.97 = 
+* Forgot
+
+= 0.96 =
 * Prep for 1.0 release
 
-= .95 =
+= 0.95 =
 * Fix ordering in sortable column
 
-= .91 =
+= 0.91 =
 * Fix links to categories and tags
 
-= .89 =
+= 0.89 =
 * Fix warnings when viewing post type with zero taxonomies
 
-= .88 =
+= 0.88 =
 * Show terms with 0 count, fix when taxonomy does not have a proper 'all_items' label
 
-= .85 =
+= 0.85 =
 * Support quick edit
 
-= .8 =
+= 0.8 =
 * Move to standard format, php >= 5.3
 
-= .76 =
+= 0.76 =
 * Move to github
 
-= .75 =
+= 0.75 =
 * Fix data to show in column on hierarchical post types
 
-= .7 =
+= 0.7 =
 * Use wp_dropdown_categories() for filtering ui
 
 = 0.61 =
 * Fix for hierarchical post types
 
-= .6 =
+= 0.6 =
 * Minor cleanup, use WP_Post class for post results
 
 = 0.58 =
