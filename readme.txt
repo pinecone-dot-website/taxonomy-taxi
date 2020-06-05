@@ -20,7 +20,7 @@ Automatically display custom taxonomy information in wp-admin/edit.php
 = 1.1.0 =
 * Require PHP >= 7.0, WP >= 4.8
 * Code formatting
-* Fix bug in filtering taxonomy from admin edit row
+* Fix bug in filtering taxonomy from admin edit row, use taxonomy query_var
 
 = 1.0.0 =
 * Seems to be working pretty dang well

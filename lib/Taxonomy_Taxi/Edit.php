@@ -120,7 +120,7 @@ class Edit
                 return sprintf(
                     '<a href="?post_type=%s&amp;%s=%s">%s</a>',
                     $column['post_type'],
-                    $column['taxonomy'],
+                    $column['query_var'],
                     $column['slug'],
                     $column['name']
                 );
@@ -177,8 +177,8 @@ class Edit
     }
 
     /**
-     * Action for `restrict_manage_posts`
-     * to display drop down selects for custom taxonomies
+     * Action for `restrict_manage_posts` to display drop down selects 
+     * for custom taxonomies on /wp-admin/edit.php
      * 
      * @param $post_type string
      * @param $which     string
@@ -187,7 +187,9 @@ class Edit
      */
     public static function restrict_manage_posts($post_type = '', $which = 'top')
     {
-        foreach (Settings::get_active_for_post_type($post_type) as $taxonomy => $props) {
+        $active_columns = Settings::get_active_for_post_type($post_type);
+      
+        foreach ($active_columns as $taxonomy => $props) {
             $html = wp_dropdown_categories(
                 [
                     'echo' => 0,

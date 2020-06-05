@@ -129,24 +129,17 @@ class Sql
                 $names = explode(',', $post->$col);
 
                 $objects = array_fill(0, count($names), 0);
+
+                $query_var = $tax->query_var;
+
                 array_walk(
                     $objects,
-                    function (&$v, $k) use ($names, $slugs, $post, $tax_name) {
-                        switch ($tax_name) {
-                            case 'category':
-                                $tax_name = 'category_name';
-                                break;
-
-                            case 'post_tag':
-                                $tax_name = 'tag';
-                                break;
-                        }
-
+                    function (&$v, $k) use ($names, $slugs, $post, $query_var) {
                         $v = [
                             'name' => $names[$k],
                             'post_type' => $post->post_type,
                             'slug' => $slugs[$k],
-                            'taxonomy' => $tax_name,
+                            'query_var' => $query_var,
                         ];
                     }
                 );
