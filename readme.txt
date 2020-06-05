@@ -1,21 +1,27 @@
 === Taxonomy Taxi ===
-Contributors: postpostmodern, pinecone-dot-io
-Donate link: https://cash.me/$EricEaglstun
-Tags: custom taxonomies, taxonomy, term
-Requires at least: 3.9
-Tested up to: 4.8
-Stable tag: trunk
+Contributors:       postpostmodern, pinecone-dot-io
+Donate link:        https://cash.app/$EricEaglstun
+Tags:               custom taxonomies, taxonomy, term
+Requires at least:  4.8
+Tested up to:       5.4.1
+Stable tag:         trunk
 
 == Description ==
 Automatically display custom taxonomy information in wp-admin/edit.php
-- requires PHP 5.3
+- requires PHP >= 7.0, WP >= 4.8
 
 == Installation ==
 1. Place /taxonomi-taxi/ directory in /wp-content/plugins/
 1. Add custom taxonomies manually, or through a plugin like [Custom Post Type UI](http://webdevstudios.com/support/wordpress-plugins/)
 1. Your edit posts table (/wp-admin/edit.php) will now show all associated taxonomies automatically!
+1. Remove unneeded columns from the settings page (/wp-admin/options-general.php?page=taxonomy_taxi)
 
 == Changelog ==
+= 1.1.0 =
+* Require PHP >= 7.0, WP >= 4.8
+* Code formatting
+* Fix bug in filtering taxonomy from admin edit row
+
 = 1.0.0 =
 * Seems to be working pretty dang well
 
