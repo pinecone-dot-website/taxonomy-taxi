@@ -13,26 +13,41 @@ class WP_Ajax
 		// Taxonomy Taxi
 		setup();
 
+		// Stock WP 5.4.1
 		global $mode;
 
 		check_ajax_referer('inlineeditnonce', '_inline_edit');
 
-		if (!isset($_POST['post_ID']) || !($post_ID = (int) $_POST['post_ID']))
+		if (!isset($_POST['post_ID']) || !(int) $_POST['post_ID']) {
 			wp_die();
+		}
+
+		$post_ID = (int) $_POST['post_ID'];
 
 		if ('page' == $_POST['post_type']) {
-			if (!current_user_can('edit_page', $post_ID)){
+			if (!current_user_can('edit_page', $post_ID)) {
 				wp_die(__('Sorry, you are not allowed to edit this page.'));
 			}
 		} else {
-			if (!current_user_can('edit_post', $post_ID)){
-				wp_die(__('Sorry, you are not allowed to edit this post.'))}
+			if (!current_user_can('edit_post', $post_ID)) {
+				wp_die(__('Sorry, you are not allowed to edit this post.'));
+			}
 		}
 
-		if ($last = wp_check_post_lock($post_ID)) {
-			$last_user = get_userdata($last);
+		$last = wp_check_post_lock($post_ID);
+		if ($last) {
+			$last_user      = get_userdata($last);
 			$last_user_name = $last_user ? $last_user->display_name : __('Someone');
-			printf($_POST['post_type'] == 'page' ? __('Saving is disabled: %s is currently editing this page.') : __('Saving is disabled: %s is currently editing this post.'),	esc_html($last_user_name));
+
+			/* translators: %s: User's display name. */
+			$msg_template = __('Saving is disabled: %s is currently editing this post.');
+
+			if ('page' === $_POST['post_type']) {
+				/* translators: %s: User's display name. */
+				$msg_template = __('Saving is disabled: %s is currently editing this page.');
+			}
+
+			printf($msg_template, esc_html($last_user_name));
 			wp_die();
 		}
 
@@ -49,8 +64,9 @@ class WP_Ajax
 		// Rename.
 		$data['user_ID'] = get_current_user_id();
 
-		if (isset($data['post_parent']))
+		if (isset($data['post_parent'])) {
 			$data['parent_id'] = $data['post_parent'];
+		}
 
 		// Status.
 		if (isset($data['keep_private']) && 'private' == $data['keep_private']) {
@@ -60,10 +76,13 @@ class WP_Ajax
 			$data['post_status'] = $data['_status'];
 		}
 
-		if (empty($data['comment_status']))
+		if (empty($data['comment_status'])) {
 			$data['comment_status'] = 'closed';
-		if (empty($data['ping_status']))
+		}
+
+		if (empty($data['ping_status'])) {
 			$data['ping_status'] = 'closed';
+		}
 
 		// Exclude terms from taxonomies that are not supposed to appear in Quick Edit.
 		if (!empty($data['tax_input'])) {
@@ -79,7 +98,7 @@ class WP_Ajax
 		// Hack: wp_unique_post_slug() doesn't work for drafts, so we will fake that our post is published.
 		if (!empty($data['post_name']) && in_array($post['post_status'], array('draft', 'pending'))) {
 			$post['post_status'] = 'publish';
-			$data['post_name'] = wp_unique_post_slug($data['post_name'], $post['ID'], $post['post_status'], $post['post_type'], $post['post_parent']);
+			$data['post_name']   = wp_unique_post_slug($data['post_name'], $post['ID'], $post['post_status'], $post['post_type'], $post['post_parent']);
 		}
 
 		// Update the post.
@@ -87,11 +106,11 @@ class WP_Ajax
 
 		$wp_list_table = _get_list_table('WP_Posts_List_Table', array('screen' => $_POST['screen']));
 
-		$mode = $_POST['post_view'] === 'excerpt' ? 'excerpt' : 'list';
+		$mode = 'excerpt' === $_POST['post_view'] ? 'excerpt' : 'list';
 
 		$level = 0;
 		if (is_post_type_hierarchical($wp_list_table->screen->post_type)) {
-			$request_post = [get_post($_POST['post_ID'])];
+			$request_post = array(get_post($_POST['post_ID']));
 			$parent       = $request_post[0]->post_parent;
 
 			while ($parent > 0) {
@@ -100,19 +119,21 @@ class WP_Ajax
 				$level++;
 			}
 		}
-
-		// Taxonomy Taxi
+		
+		// Taxonomy Taxi again! 
 		$posts = get_posts(
 			[
-			'p' => $post_ID,
-			'post_type' => 'any',
-			'post_status' => 'any',
-			'suppress_filters' => FALSE,
-			'posts_per_page' => 1,
-		]);
+				'p' => $_POST['post_ID'],
+				'post_type' => $_POST['post_type'],
+				'post_status' => 'any',
+				'suppress_filters' => false,
+				'posts_per_page' => 1,
+			]
+		);
 
-		$wp_list_table->display_rows(array($posts[0]), $level);
+		$wp_list_table->display_rows($posts, $level);
 
+		// Thank u next
 		wp_die();
 	}
 }
