@@ -120,7 +120,7 @@ class Edit
                 return sprintf(
                     '<a href="?post_type=%s&amp;%s=%s">%s</a>',
                     $column['post_type'],
-                    $column['query_var'],
+                    sprintf('taxonomy_taxi[%s]', $column['taxonomy']),
                     $column['slug'],
                     $column['name']
                 );
@@ -188,16 +188,19 @@ class Edit
     public static function restrict_manage_posts($post_type = '', $which = 'top')
     {
         $active_columns = Settings::get_active_for_post_type($post_type);
-      
+
         foreach ($active_columns as $taxonomy => $props) {
+            $query_var = sprintf('taxonomy_taxi[%s]', $props->name);
+
             $html = wp_dropdown_categories(
                 [
                     'echo' => 0,
                     'hide_empty' => true,
                     'hide_if_empty' => false,
                     'hierarchical' => true,
-                    'name' => $props->query_var,
-                    'selected' => isset($_GET[$props->query_var]) ? $_GET[$props->query_var] : false,
+                    'name' => $query_var,
+                    'orderby' => 'name',
+                    'selected' => isset($_GET['taxonomy_taxi'][$props->name]) ? $_GET['taxonomy_taxi'][$props->name] : false,
                     //'show_count' => TRUE,
                     'show_option_all' => 'View ' . $props->view_all,
                     'show_option_none' => sprintf('[ No %s ]', $props->label),

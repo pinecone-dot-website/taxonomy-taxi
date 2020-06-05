@@ -45,7 +45,7 @@ class Sql
 					   		ORDER BY T_AUTO.name ASC 
 					   ) AS `{$tax}_slugs` /* Taxonomy_Taxi posts_fields {$tax} */";
         }
-
+       
         return $sql;
     }
 
@@ -78,12 +78,14 @@ class Sql
     {
         global $wpdb;
 
-        $sql .= " LEFT JOIN " . $wpdb->term_relationships . " TR_AUTO 
+        $sql .= " /* Taxonomy_Taxi posts_join start */
+                  LEFT JOIN " . $wpdb->term_relationships . " TR_AUTO 
 					ON " . $wpdb->posts . ".ID = TR_AUTO.object_id
 				  LEFT JOIN " . $wpdb->term_taxonomy . " TX_AUTO 
 				  	ON TR_AUTO.term_taxonomy_id = TX_AUTO.term_taxonomy_id 
 				  LEFT JOIN " . $wpdb->terms . " T_AUTO 
-				  	ON TX_AUTO.term_id = T_AUTO.term_id /* Taxonomy_Taxi posts_join */";
+                      ON TX_AUTO.term_id = T_AUTO.term_id 
+                  /* Taxonomy_Taxi posts_join end */";
 
         return $sql;
     }
@@ -121,7 +123,7 @@ class Sql
 
             foreach (Edit::get_taxonomies($post->post_type) as $tax) {
                 $tax_name = esc_sql($tax->name);
-
+             
                 $col = $tax_name . '_slugs';
                 $slugs = explode(',', $post->$col);
 
@@ -130,16 +132,14 @@ class Sql
 
                 $objects = array_fill(0, count($names), 0);
 
-                $query_var = $tax->query_var;
-
                 array_walk(
                     $objects,
-                    function (&$v, $k) use ($names, $slugs, $post, $query_var) {
+                    function (&$v, $k) use ($names, $slugs, $post, $tax_name) {
                         $v = [
                             'name' => $names[$k],
                             'post_type' => $post->post_type,
                             'slug' => $slugs[$k],
-                            'query_var' => $query_var,
+                            'taxonomy' => $tax_name,
                         ];
                     }
                 );
