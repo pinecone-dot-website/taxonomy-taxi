@@ -31,11 +31,14 @@ class Walker extends \Walker_CategoryDropdown
             $args['value'] = ($term->taxonomy != 'category' ? 'slug' : 'id');
         }
 
-        $output .= render('admin/edit-option', [
-            'depth' => $depth,
-            'display_name' => $pad . $cat_name,
-            'selected' => $args['selected'],
-            'term' => $term,
-        ]);
+        $output .= render(
+            'admin/edit-option',
+            [
+                'depth' => $depth,
+                'display_name' => $pad . $cat_name,
+                'selected' => $args['selected'],
+                'term' => $term,
+            ]
+        );
     }
 }

@@ -57,13 +57,18 @@ class Settings_Page
      */
     public static function admin_footer_text($original = '')
     {
-        return render('admin/options-general_footer', array(
-            'version' => version()
-        ));
+        return render(
+            'admin/options-general_footer',
+            [
+                'version' => version(),
+            ]
+        );
     }
 
     /**
-     * callback for add_settings_section to render description field
+     * Callback for add_settings_section to render description field
+     * 
+     * @return void
      */
     public static function description()
     {
@@ -111,7 +116,7 @@ class Settings_Page
     }
 
     /**
-     * callback for add_settings_field to render form ui
+     * Callback for add_settings_field to render form ui
      */
     public static function render_settings_page()
     {
@@ -125,8 +130,10 @@ class Settings_Page
     }
 
     /**
-     * only save unchecked checkboxes
-     * @param array
+     * Only save unchecked checkboxes
+     * 
+     * @param $form_data array
+     * 
      * @return array
      */
     public static function save($form_data)
@@ -147,13 +154,18 @@ class Settings_Page
         // fix saving the options when there is no option saved in the db yet
         // i have no idea why this works
         // @TODO make this not suck
-        add_filter("pre_update_option_taxonomy_taxi", function ($value, $old_value, $option) use ($form_data) {
-            if ($old_value === false) {
-                $value = $form_data;
-            }
+        add_filter(
+            "pre_update_option_taxonomy_taxi",
+            function ($value, $old_value, $option) use ($form_data) {
+                if ($old_value === false) {
+                    $value = $form_data;
+                }
 
-            return $value;
-        }, 10, 3);
+                return $value;
+            },
+            10,
+            3
+        );
 
         return $saved;
     }

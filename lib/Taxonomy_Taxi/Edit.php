@@ -15,7 +15,8 @@ class Edit
     protected static $post_type = '';
 
     /**
-     * 
+     * Cache taxonomies associated with the post type.
+     * Key - post type, Value - get_object_taxonomies() as objects
      * 
      * @var array
      */
@@ -83,9 +84,12 @@ class Edit
         unset($headings['tags']);
 
         $a = array_slice($headings, 0, $key);
-        $b = array_map(function ($tax) {
-            return $tax->label;
-        }, Settings::get_active_for_post_type(self::$post_type));
+        $b = array_map(
+            function ($tax) {
+                return $tax->label;
+            },
+            Settings::get_active_for_post_type(self::$post_type)
+        );
 
         $c = array_slice($headings, $key);
 
@@ -136,9 +140,12 @@ class Edit
      */
     public static function register_sortable_columns($columns)
     {
-        $keys = array_map(function ($tax) {
-            return $tax->name;
-        }, Settings::get_active_for_post_type(self::$post_type));
+        $keys = array_map(
+            function ($tax) {
+                return $tax->name;
+            },
+            Settings::get_active_for_post_type(self::$post_type)
+        );
 
         if (count($keys)) {
             $keys = array_combine($keys, $keys);
@@ -202,8 +209,10 @@ class Edit
     }
 
     /**
-     *
-     * @param string
+     * Get the taxonomies associated with the post type
+     * 
+     * @param $post_type string
+     * 
      * @return array
      */
     public static function get_taxonomies($post_type)
@@ -216,7 +225,12 @@ class Edit
     }
 
     /**
-     * @param string
+     * Store the taxonomies for the post type
+     * for improved performace 
+     * 
+     * @param $post_type string
+     * 
+     * @return void
      */
     protected static function set_taxonomies($post_type)
     {

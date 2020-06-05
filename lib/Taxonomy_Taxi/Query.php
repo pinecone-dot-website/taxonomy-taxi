@@ -46,7 +46,7 @@ class Query
     }
 
     /**
-     * handle the taxonomies sent as [None] from request()
+     * Handle the taxonomies sent as [None] from request()
      * 
      * @param $wp_query WP_Query
      * 

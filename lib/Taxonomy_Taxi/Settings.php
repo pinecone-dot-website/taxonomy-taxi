@@ -4,7 +4,11 @@ namespace Taxonomy_Taxi;
 
 class Settings
 {
-    // save user settings to prevent multiple calls to get_option
+    /**
+     * Save user settings to prevent multiple calls to get_option
+     * 
+     * @var array
+     */
     protected static $settings = [];
 
     /**

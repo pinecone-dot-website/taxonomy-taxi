@@ -4,6 +4,9 @@ namespace Taxonomy_Taxi;
 
 class Sql
 {
+    /**
+     * 
+     */
     public static function init()
     {
         add_filter('posts_fields', __CLASS__ . '::posts_fields', 10, 2);
@@ -17,7 +20,7 @@ class Sql
     }
 
     /**
-     * filter for `posts_fields` to select joined taxonomy data into the main query
+     * Filter for `posts_fields` to select joined taxonomy data into the main query
      * 
      * @param $sql      string
      * @param $wp_query WP_Query
@@ -95,8 +98,6 @@ class Sql
      */
     public static function posts_orderby($sql, $wp_query)
     {
-        global $wpdb;
-
         if (isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies($wp_query->query_vars['post_type']))) {
             $sql = $wp_query->query_vars['orderby'] . "_slugs " . $wp_query->query_vars['order'] . " /* Taxonomy_Taxi posts_orderby */";
         }
@@ -116,7 +117,7 @@ class Sql
     {
         // assigning to &$post was not working on wpengine...
         foreach ($posts as $k => $post) {
-            $taxonomies = array();
+            $taxonomies = [];
 
             foreach (Edit::get_taxonomies($post->post_type) as $tax) {
                 $tax_name = esc_sql($tax->name);
@@ -145,7 +146,7 @@ class Sql
                             'name' => $names[$k],
                             'post_type' => $post->post_type,
                             'slug' => $slugs[$k],
-                            'taxonomy' => $tax_name
+                            'taxonomy' => $tax_name,
                         ];
                     }
                 );
@@ -166,9 +167,11 @@ class Sql
     }
 
     /**
-     * just for debugging, view the sql query that populates the Edit table
-     * @param WP_Query
-     * @param string
+     * Just for debugging, view the sql query that populates the Edit table
+     * 
+     * @param $sql      string
+     * @param $wp_query WP_Query
+     * 
      * @return string
      */
     public static function posts_request($sql, $wp_query)
