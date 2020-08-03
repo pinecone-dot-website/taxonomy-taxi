@@ -71,7 +71,7 @@ class Edit
 
         // if that doesnt work put before date
         if (!$key) {
-            $key = array_search('date', $keys) ? array_search('date', $keys) - 1 : false;
+            $key = array_search('date', $keys) ? array_search('date', $keys) : false;
         }
 
         //  arbitary placement in table if it cant find category, comments, or date

@@ -119,7 +119,7 @@ class WP_Ajax
 				$level++;
 			}
 		}
-		
+
 		// Taxonomy Taxi again! 
 		$posts = get_posts(
 			[

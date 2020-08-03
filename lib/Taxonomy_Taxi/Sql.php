@@ -45,7 +45,7 @@ class Sql
 					   		ORDER BY T_AUTO.name ASC 
 					   ) AS `{$tax}_slugs` /* Taxonomy_Taxi posts_fields {$tax} */";
         }
-       
+
         return $sql;
     }
 
@@ -123,7 +123,7 @@ class Sql
 
             foreach (Edit::get_taxonomies($post->post_type) as $tax) {
                 $tax_name = esc_sql($tax->name);
-             
+
                 $col = $tax_name . '_slugs';
                 $slugs = explode(',', $post->$col);
 
