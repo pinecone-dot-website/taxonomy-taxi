@@ -17,6 +17,9 @@ Automatically display custom taxonomy information in wp-admin/edit.php
 1. Remove unneeded columns from the settings page (/wp-admin/options-general.php?page=taxonomy_taxi)
 
 == Changelog ==
+= 1.1.2 =
+* Fix escaping in orderby clause 
+
 = 1.1.0 =
 * Require PHP >= 7.0, WP >= 4.8
 * Code formatting

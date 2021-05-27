@@ -101,7 +101,7 @@ class Sql
     public static function posts_orderby($sql, $wp_query)
     {
         if (isset($wp_query->query_vars['orderby']) && array_key_exists($wp_query->query_vars['orderby'], Edit::get_taxonomies($wp_query->query_vars['post_type']))) {
-            $sql = $wp_query->query_vars['orderby'] . "_slugs " . $wp_query->query_vars['order'] . " /* Taxonomy_Taxi posts_orderby */";
+            $sql = sprintf("`%s` %s /* Taxonomy_Taxi posts_orderby */", $wp_query->query_vars['orderby'] . '_slugs', $wp_query->query_vars['order']);
         }
 
         return $sql;
